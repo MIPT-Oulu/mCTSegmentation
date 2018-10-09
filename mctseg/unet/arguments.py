@@ -1,10 +1,11 @@
 import argparse
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='/media/lext/FAST/PTA_segmentation_project/Data/post_processed')
     parser.add_argument('--snapshots', default='/media/lext/FAST/PTA_segmentation_project/snapshots/')
-    parser.add_argument('--logs', default='/media/lext/FAST/PTA_segmentation_project/snapshots/')
+    parser.add_argument('--logs', default='/media/lext/FAST/PTA_segmentation_project/logs/')
     parser.add_argument('--bs', type=int, default=32)
     parser.add_argument('--val_bs', type=int, default=32)
     parser.add_argument('--n_folds', type=int, default=3)
