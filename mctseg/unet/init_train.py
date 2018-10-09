@@ -8,7 +8,7 @@ from mctseg.utils import GlobalLogger, git_info
 
 def init_train():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='/media/lext/FAST/PTA_segmentation_project/Data/post_processed')
+    parser.add_argument('--dataset', default='/media/lext/FAST/PTA_segmentation_project/Data/pre_processed')
     parser.add_argument('--snapshots', default='/media/lext/FAST/PTA_segmentation_project/snapshots/')
     parser.add_argument('--logs', default='/media/lext/FAST/PTA_segmentation_project/logs/')
     parser.add_argument('--bs', type=int, default=32)
@@ -52,5 +52,5 @@ def init_train():
         logger.update(f'[{fold_id}] val_loss', None, list)
         logger.update(f'[{fold_id}] val_dice', None, list)
     logger.save(os.path.join(args.snapshots, snapshot_name, 'log.json'))
-    
+
     return args, snapshot_name

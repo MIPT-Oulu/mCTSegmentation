@@ -10,7 +10,7 @@ class SegmentationDataset(data.Dataset):
 
     def __getitem__(self, idx):
         entry = self.split.iloc[idx]
-        img_fname = entry.slice_fname
+        img_fname = entry.img_fname
         mask_fname = entry.mask_fname
 
         img = self.read_img(img_fname)
