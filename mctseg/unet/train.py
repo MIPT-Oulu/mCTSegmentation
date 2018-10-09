@@ -21,11 +21,11 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
 
-from mctseg.unet.arguments import parse_args
+from mctseg.unet.init_train import init_train
 from mctseg.unet.model import UNet
 from mctseg.unet.dataset import SegmentationDataset
 from mctseg.unet.loss import BCEWithLogitsLoss2d, BinaryDiceLoss, CombinedLoss
-from mctseg.utils import read_gs_ocv
+from mctseg.utils import read_gs_ocv, GlobalLogger, git_info
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 cv2.ocl.setUseOpenCL(False)
@@ -34,10 +34,4 @@ cv2.setNumThreads(0)
 DEBUG = sys.gettrace() is not None
 
 if __name__ == "__main__":
-    args = parse_args()
-    torch.manual_seed(args.seed)
-    torch.cuda.manual_seed(args.seed)
-    np.random.seed(args.seed)
-
-    snapshots_dir = os.path.join(args.snapshots)
-    os.makedirs(snapshots_dir, exist_ok=True)
+    args, snapshot_name = init_train()
