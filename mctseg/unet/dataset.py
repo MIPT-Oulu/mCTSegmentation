@@ -44,7 +44,7 @@ def init_data_processing():
     dataset = SegmentationDataset(split=kvs['metadata'],
                                   trf=train_augs,
                                   read_img=read_gs_ocv,
-                                  read_mask=read_gs_ocv)
+                                  read_mask=read_gs_mask_ocv)
 
     mean_vector, std_vector, class_weights = init_mean_std(snapshots_dir=kvs['args'].snapshots,
                                                            dataset=dataset,
@@ -62,7 +62,7 @@ def init_data_processing():
         partial(apply_by_index, transform=gs2tens, idx=[0, 1]),
         partial(apply_by_index, transform=norm_trf, idx=0)
     ])
-
+    kvs.update('class_weights', class_weights)
     kvs.update('train_trf', train_trf)
     kvs.update('val_trf', val_trf)
     kvs.save_pkl(os.path.join(kvs['args'].snapshots, kvs['snapshot_name'], 'session.pkl'))
@@ -120,6 +120,10 @@ def read_gs_ocv(fname):
     return np.expand_dims(cv2.imread(fname, 0), -1)
 
 
+def read_gs_mask_ocv(fname):
+    return np.expand_dims((cv2.imread(fname, 0) > 0).astype(np.float32), -1)
+
+
 def init_mean_std(snapshots_dir, dataset, batch_size, n_threads, n_classes):
     if os.path.isfile(os.path.join(snapshots_dir, 'mean_std_weights.npy')):
         tmp = np.load(os.path.join(snapshots_dir, 'mean_std_weights.npy'))
@@ -149,7 +153,6 @@ def init_mean_std(snapshots_dir, dataset, batch_size, n_threads, n_classes):
         std_vector /= len(tmp_loader)
         class_weights /= num_pixels
         class_weights = 1 / class_weights
-        class_weights /= class_weights.max()
         np.save(os.path.join(snapshots_dir, 'mean_std_weights.npy'), [mean_vector.astype(np.float32),
                                                                       std_vector.astype(np.float32),
                                                                       class_weights.astype(np.float32)])

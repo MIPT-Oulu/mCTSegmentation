@@ -32,7 +32,7 @@ def train_epoch(fold, epoch, net, optimizer, train_loader, criterion, max_ep):
     return running_loss / n_batches
 
 
-def val_epoch(epoch, max_epoch, model, val_loader, criterion, n_classes=3):
+def validate_epoch(epoch, max_epoch, model, val_loader, criterion, n_classes=3):
     model.train(False)
     device = next(model.parameters()).device
     confusion_matrix = np.zeros((n_classes, n_classes), dtype=np.uint32)
@@ -55,9 +55,8 @@ def val_epoch(epoch, max_epoch, model, val_loader, criterion, n_classes=3):
             confusion_matrix += calculate_confusion_matrix_from_arrays(preds, mask, n_classes)
 
     val_loss /= len(val_loader)
-    dices = {'dice_{}'.format(cls): dice for cls, dice in enumerate(calculate_dice(confusion_matrix))}
 
-    return val_loss, confusion_matrix, dices
+    return val_loss, confusion_matrix
 
 
 def calculate_confusion_matrix_from_arrays(prediction, ground_truth, nr_labels):
