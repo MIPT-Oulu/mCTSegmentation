@@ -1,9 +1,12 @@
 import argparse
-import torch
 import numpy as np
-import os
 import time
 from mctseg.utils import GlobalKVS, git_info
+
+
+import torch
+from termcolor import colored
+import os
 
 
 def init_session():
@@ -66,3 +69,20 @@ def parse_args():
     args = parser.parse_args()
 
     return args
+
+
+def save_checkpoint(cur_snapshot_name, model, loss_value, prev_model, best_loss):
+    if prev_model is None:
+        print(colored('====> ', 'red') + 'Snapshot was saved to', cur_snapshot_name)
+        torch.save(model.state_dict(), cur_snapshot_name)
+        prev_model = cur_snapshot_name
+        best_loss = loss_value
+        return prev_model, best_loss
+    else:
+        if loss_value < best_loss:
+            print(colored('====> ', 'red') + 'Snapshot was saved to', cur_snapshot_name)
+            os.remove(prev_model)
+            best_loss = loss_value
+            torch.save(model.state_dict(), cur_snapshot_name)
+            prev_model = cur_snapshot_name
+    return prev_model, best_loss
