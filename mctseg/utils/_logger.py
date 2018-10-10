@@ -43,6 +43,12 @@ class GlobalKVS(object):
             else:
                 self._d[tag] = value
 
+    def __getitem__(self, tag):
+        return self._d[tag][0]
+
+    def tag_ts(self, tag):
+        return self._d[tag]
+
     def save_pkl(self, filename):
         with open(filename, 'wb') as f:
             pickle.dump(self, f)

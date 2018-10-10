@@ -6,7 +6,23 @@ import time
 from mctseg.utils import GlobalKVS, git_info
 
 
-def init_train():
+def init_session():
+    # Getting the arguments
+    args = parse_args()
+    # Initializing the seeds
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
+    np.random.seed(args.seed)
+    # Creating teh snapshot
+    snapshot_name = time.strftime('%Y_%m_%d_%H_%M')
+    os.makedirs(os.path.join(args.snapshots, snapshot_name), exist_ok=True)
+    # Making a log
+    log_init_session(args, snapshot_name)
+
+    return args, snapshot_name
+
+
+def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='/media/lext/FAST/PTA_segmentation_project/Data/pre_processed')
     parser.add_argument('--snapshots', default='/media/lext/FAST/PTA_segmentation_project/snapshots/')
@@ -26,30 +42,31 @@ def init_train():
     parser.add_argument('--seed', type=int, default=42)
     args = parser.parse_args()
 
-    torch.manual_seed(args.seed)
-    torch.cuda.manual_seed(args.seed)
-    np.random.seed(args.seed)
+    return args
 
-    snapshot_name = time.strftime('%Y_%m_%d_%H_%M')
-    os.makedirs(os.path.join(args.snapshots, snapshot_name), exist_ok=True)
 
-    logger = GlobalKVS()
+def log_init_session(args, snapshot_name):
+    kvs = GlobalKVS()
     res = git_info()
     if res is not None:
-        logger.update('git branch name', res[0])
-        logger.update('git commit id', res[1])
-    logger.update('pytorch_version', torch.__version__)
-    if torch.cuda.is_available():
-        logger.update('cuda', torch.version.cuda)
-
+        kvs.update('git branch name', res[0])
+        kvs.update('git commit id', res[1])
     else:
-        logger.update('cuda', None)
-    logger.update('gpus', torch.cuda.device_count())
-    logger.update('snapshot_name', snapshot_name)
-    logger.update('args', args)
-    logger.update('train_loss', dict)
-    logger.update('val_loss', None, dict)
-    logger.update('val_metrics', None, dict)
-    logger.save(os.path.join(args.snapshots, snapshot_name, 'log.pkl'))
+        kvs.update('git branch name', None)
+        kvs.update('git commit id', None)
 
-    return args, snapshot_name
+    kvs.update('pytorch_version', torch.__version__)
+
+    if torch.cuda.is_available():
+        kvs.update('cuda', torch.version.cuda)
+        kvs.update('gpus', None)
+    else:
+        kvs.update('cuda', None)
+        kvs.update('gpus', torch.cuda.device_count())
+
+    kvs.update('snapshot_name', snapshot_name)
+    kvs.update('args', args)
+    kvs.update('train_loss', None, dict)
+    kvs.update('val_loss', None, dict)
+    kvs.update('val_metrics', None, dict)
+    kvs.save_pkl(os.path.join(args.snapshots, snapshot_name, 'log.pkl'))
