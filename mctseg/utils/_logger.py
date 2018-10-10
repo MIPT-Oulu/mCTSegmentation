@@ -1,16 +1,16 @@
-import json
 import os
 import subprocess
 import datetime
+import pickle
 
 
-class GlobalLogger(object):
+class GlobalKVS(object):
     _instance = None
     _d = dict()
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(GlobalLogger, cls).__new__(cls, *args, **kwargs)
+            cls._instance = super(GlobalKVS, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
     def update(self, tag, value, dtype=None):
@@ -43,30 +43,9 @@ class GlobalLogger(object):
             else:
                 self._d[tag] = value
 
-    def json(self, indent=4):
-        """
-        Dumps the content of the logger into JSON-formatted string
-
-        Parameters
-        ----------
-        indent : int
-            Indentation level to be used
-
-        Returns
-        -------
-        out : str
-            JSON-formatted string, the content of the logger
-
-        """
-        return json.dumps(self._d, indent=indent)
-
-    def __repr__(self):
-        return self.json()
-
-    def save(self, filename):
-        with open(filename, 'w') as f:
-            f.write(self.json())
-            f.flush()
+    def save_pkl(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
 
 
 # Return the git revision as a string
@@ -82,26 +61,16 @@ def git_info():
         env['LANGUAGE'] = 'C'
         env['LANG'] = 'C'
         env['LC_ALL'] = 'C'
-        out = subprocess.Popen(cmd, stdout = subprocess.PIPE, env=env).communicate()[0]
-        return out
+        return subprocess.Popen(cmd, stdout = subprocess.PIPE, env=env).communicate()[0]
 
     try:
         out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
         git_revision = out.strip().decode('ascii')
 
-        out = _minimal_ext_cmd(['git', 'rev-parse','--abbrev-ref' ,'HEAD'])
+        out = _minimal_ext_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
         git_branch = out.strip().decode('ascii')
     except OSError:
         return None
 
     return git_branch, git_revision
-
-
-if __name__ == "__main__":
-    logger = GlobalLogger()
-    res = git_info()
-    if res is not None:
-        logger.update('git branch name', res[0])
-        logger.update('git commit id', res[1])
-    print(logger)
 

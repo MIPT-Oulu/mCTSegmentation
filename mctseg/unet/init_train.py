@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import os
 import time
-from mctseg.utils import GlobalLogger, git_info
+from mctseg.utils import GlobalKVS, git_info
 
 
 def init_train():
@@ -33,7 +33,7 @@ def init_train():
     snapshot_name = time.strftime('%Y_%m_%d_%H_%M')
     os.makedirs(os.path.join(args.snapshots, snapshot_name), exist_ok=True)
 
-    logger = GlobalLogger()
+    logger = GlobalKVS()
     res = git_info()
     if res is not None:
         logger.update('git branch name', res[0])
@@ -46,11 +46,10 @@ def init_train():
         logger.update('cuda', None)
     logger.update('gpus', torch.cuda.device_count())
     logger.update('snapshot_name', snapshot_name)
-    logger.update('args', vars(args))
-    for fold_id in range(args.n_folds):
-        logger.update(f'[{fold_id}] train_loss', None, list)
-        logger.update(f'[{fold_id}] val_loss', None, list)
-        logger.update(f'[{fold_id}] val_dice', None, list)
-    logger.save(os.path.join(args.snapshots, snapshot_name, 'log.json'))
+    logger.update('args', args)
+    logger.update('train_loss', dict)
+    logger.update('val_loss', None, dict)
+    logger.update('val_metrics', None, dict)
+    logger.save(os.path.join(args.snapshots, snapshot_name, 'log.pkl'))
 
     return args, snapshot_name
