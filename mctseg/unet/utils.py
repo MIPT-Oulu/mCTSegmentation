@@ -12,11 +12,11 @@ def train_epoch(fold, epoch, net, optimizer, train_loader, criterion, max_ep):
     pbar = tqdm(total=n_batches, ncols=200)
     for i, entry in enumerate(train_loader):
         inputs = entry['img'].to("cuda")
-        labels = entry['target'].to("cuda")
+        mask = entry['mask'].to("cuda")
 
         optimizer.zero_grad()
         outputs = net(inputs)
-        loss = criterion(outputs, labels)
+        loss = criterion(outputs, mask)
         loss.backward()
         optimizer.step()
 
@@ -38,10 +38,10 @@ def validate_epoch(epoch, max_epoch, model, val_loader, criterion, n_classes=3):
     confusion_matrix = np.zeros((n_classes, n_classes), dtype=np.uint32)
     val_loss = 0
     with torch.no_grad():
-        for batch, mask in tqdm(val_loader, total=len(val_loader), desc=f"[{epoch} / {max_epoch}] Val: "):
-            batch = batch.to(device)
-            mask = mask.to(device).squeeze()
-            preds = model(batch)
+        for entry in tqdm(val_loader, total=len(val_loader), desc=f"[{epoch} / {max_epoch}] Val: "):
+            img = entry['img'].to(device)
+            mask = entry['mask'].to(device).squeeze()
+            preds = model(img)
             val_loss += criterion(preds, mask).item()
 
             mask = mask.to('cpu').numpy()

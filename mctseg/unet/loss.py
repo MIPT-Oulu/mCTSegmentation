@@ -1,4 +1,6 @@
 from torch import nn
+import torch
+import numpy as np
 
 
 class BCEWithLogitsLoss2d(nn.Module):
@@ -6,9 +8,11 @@ class BCEWithLogitsLoss2d(nn.Module):
 
     """
 
-    def __init__(self, weight=None, size_average=True):
+    def __init__(self, weight=None, reduction='elementwise_mean'):
         super(BCEWithLogitsLoss2d, self).__init__()
-        self.bce_loss = nn.BCEWithLogitsLoss(weight, size_average)
+        if isinstance(weight, np.ndarray):
+            weight = torch.from_numpy(weight)
+        self.bce_loss = nn.BCEWithLogitsLoss(weight, reduction)
 
     def forward(self, logits, targets):
         logits_flat = logits.view(-1)
@@ -56,4 +60,10 @@ class CombinedLoss(nn.Module):
         return loss
 
 
+def loss_dict(class_weights):
+    return {'combined': CombinedLoss([BCEWithLogitsLoss2d(), BinaryDiceLoss()]),
+            'bce': BCEWithLogitsLoss2d(),
+            'dice': BinaryDiceLoss(),
+            'wbce': BCEWithLogitsLoss2d(weight=class_weights)
+            }
 
