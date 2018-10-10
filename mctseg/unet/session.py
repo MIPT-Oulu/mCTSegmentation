@@ -8,19 +8,24 @@ import torch
 from termcolor import colored
 import os
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if not torch.cuda.is_available():
+    raise EnvironmentError('The code must be run on GPU.')
+
 
 def init_session():
+    kvs = GlobalKVS()
+
     # Getting the arguments
     args = parse_args()
     # Initializing the seeds
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed(args.seed)
     np.random.seed(args.seed)
-    # Creating teh snapshot
+    # Creating the snapshot
     snapshot_name = time.strftime('%Y_%m_%d_%H_%M')
     os.makedirs(os.path.join(args.snapshots, snapshot_name), exist_ok=True)
 
-    kvs = GlobalKVS()
     res = git_info()
     if res is not None:
         kvs.update('git branch name', res[0])
@@ -33,10 +38,10 @@ def init_session():
 
     if torch.cuda.is_available():
         kvs.update('cuda', torch.version.cuda)
-        kvs.update('gpus', None)
+        kvs.update('gpus', torch.cuda.device_count())
     else:
         kvs.update('cuda', None)
-        kvs.update('gpus', torch.cuda.device_count())
+        kvs.update('gpus', None)
 
     kvs.update('snapshot_name', snapshot_name)
     kvs.update('args', args)
@@ -61,7 +66,7 @@ def parse_args():
     parser.add_argument('--n_threads', type=int, default=12)
     parser.add_argument('--start_val', type=int, default=-1)
     parser.add_argument('--depth', type=int, default=6)
-    parser.add_argument('--cd', type=int, default=1)
+    parser.add_argument('--cdepth', type=int, default=1)
     parser.add_argument('--bw', type=int, default=24)
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--wd', type=float, default=5e-5)

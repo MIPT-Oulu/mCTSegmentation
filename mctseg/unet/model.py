@@ -103,32 +103,32 @@ class UNet(nn.Module):
 
     """
 
-    def __init__(self, BW=24, depth=6, center_depth=2, n_inputs=1, n_classes=1, activation='relu'):
+    def __init__(self, bw=24, depth=6, center_depth=2, n_inputs=1, n_classes=1, activation='relu'):
         super().__init__()
         # Preparing the modules dict
         modules = OrderedDict()
-        modules['down1'] = Encoder(n_inputs, BW, activation=activation)
+        modules['down1'] = Encoder(n_inputs, bw, activation=activation)
         # Automatically creating the Encoder based on the depth and width
 
         for level in range(2, depth + 1):
             mul_in = 2 ** (level - 2)
             mul_out = 2 ** (level - 1)
-            layer = Encoder(BW * mul_in, BW * mul_out, activation=activation)
+            layer = Encoder(bw * mul_in, bw * mul_out, activation=activation)
             modules['down' + str(level)] = layer
 
             # Creating the center
         modules['center'] = nn.Sequential(
-            *[ConvBlock3(BW * mul_out, BW * mul_out, activation) for _ in range(center_depth)]
+            *[ConvBlock3(bw * mul_out, bw * mul_out, activation) for _ in range(center_depth)]
             )
         # Automatically creating the decoder
         for level in reversed(range(2, depth + 1)):
             mul_in = 2 ** (level - 1)
-            layer = Decoder(2 * BW * mul_in, BW * mul_in // 2, activation=activation)
+            layer = Decoder(2 * bw * mul_in, bw * mul_in // 2, activation=activation)
             modules['up' + str(level)] = layer
 
-        modules['up1'] = Decoder(BW + BW, BW, activation=activation)
+        modules['up1'] = Decoder(bw + bw, bw, activation=activation)
 
-        modules['mixer'] = nn.Conv2d(BW, n_classes, kernel_size=1, padding=0, stride=1, bias=True)
+        modules['mixer'] = nn.Conv2d(bw, n_classes, kernel_size=1, padding=0, stride=1, bias=True)
 
         self.__dict__['_modules'] = modules
 
