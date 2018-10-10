@@ -153,6 +153,7 @@ def init_mean_std(snapshots_dir, dataset, batch_size, n_threads, n_classes):
         std_vector /= len(tmp_loader)
         class_weights /= num_pixels
         class_weights = 1 / class_weights
+        class_weights /= class_weights.max()
         np.save(os.path.join(snapshots_dir, 'mean_std_weights.npy'), [mean_vector.astype(np.float32),
                                                                       std_vector.astype(np.float32),
                                                                       class_weights.astype(np.float32)])
