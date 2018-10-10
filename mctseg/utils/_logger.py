@@ -51,7 +51,7 @@ class GlobalKVS(object):
 
     def save_pkl(self, filename):
         with open(filename, 'wb') as f:
-            pickle.dump(self, f)
+            pickle.dump(self._d, f)
 
 
 # Return the git revision as a string

@@ -16,8 +16,31 @@ def init_session():
     # Creating teh snapshot
     snapshot_name = time.strftime('%Y_%m_%d_%H_%M')
     os.makedirs(os.path.join(args.snapshots, snapshot_name), exist_ok=True)
-    # Making a log
-    log_init_session(args, snapshot_name)
+
+    kvs = GlobalKVS()
+    res = git_info()
+    if res is not None:
+        kvs.update('git branch name', res[0])
+        kvs.update('git commit id', res[1])
+    else:
+        kvs.update('git branch name', None)
+        kvs.update('git commit id', None)
+
+    kvs.update('pytorch_version', torch.__version__)
+
+    if torch.cuda.is_available():
+        kvs.update('cuda', torch.version.cuda)
+        kvs.update('gpus', None)
+    else:
+        kvs.update('cuda', None)
+        kvs.update('gpus', torch.cuda.device_count())
+
+    kvs.update('snapshot_name', snapshot_name)
+    kvs.update('args', args)
+    kvs.update('train_loss', None, dict)
+    kvs.update('val_loss', None, dict)
+    kvs.update('val_metrics', None, dict)
+    kvs.save_pkl(os.path.join(args.snapshots, snapshot_name, 'session.pkl'))
 
     return args, snapshot_name
 
@@ -43,30 +66,3 @@ def parse_args():
     args = parser.parse_args()
 
     return args
-
-
-def log_init_session(args, snapshot_name):
-    kvs = GlobalKVS()
-    res = git_info()
-    if res is not None:
-        kvs.update('git branch name', res[0])
-        kvs.update('git commit id', res[1])
-    else:
-        kvs.update('git branch name', None)
-        kvs.update('git commit id', None)
-
-    kvs.update('pytorch_version', torch.__version__)
-
-    if torch.cuda.is_available():
-        kvs.update('cuda', torch.version.cuda)
-        kvs.update('gpus', None)
-    else:
-        kvs.update('cuda', None)
-        kvs.update('gpus', torch.cuda.device_count())
-
-    kvs.update('snapshot_name', snapshot_name)
-    kvs.update('args', args)
-    kvs.update('train_loss', None, dict)
-    kvs.update('val_loss', None, dict)
-    kvs.update('val_metrics', None, dict)
-    kvs.save_pkl(os.path.join(args.snapshots, snapshot_name, 'log.pkl'))
