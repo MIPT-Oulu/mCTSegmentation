@@ -24,7 +24,7 @@ import torch.nn as nn
 from mctseg.unet.session import init_session
 from mctseg.unet.metadata import init_metadata
 from mctseg.unet.model import UNet
-from mctseg.unet.dataset import init_augmentations, SegmentationDataset
+from mctseg.unet.dataset import init_data_processing, SegmentationDataset
 from mctseg.unet.loss import BCEWithLogitsLoss2d, BinaryDiceLoss, CombinedLoss
 from mctseg.utils import GlobalKVS
 
@@ -38,21 +38,20 @@ if __name__ == "__main__":
     kvs = GlobalKVS()
     init_session()
     init_metadata()
-    init_augmentations()
+    init_data_processing()
 
     gkf = GroupKFold(kvs['args'].n_folds)
     for fold_id, (train_idx, val_idx) in enumerate(gkf.split(kvs['metadata'], groups=kvs['metadata'].subject_id)):
-        print(train_idx.shape)
         net = UNet(bw=kvs['args'].bw, depth=kvs['args'].depth,
                    center_depth=kvs['args'].cdepth,
-                   n_inputs=1,
-                   n_classes=1,
+                   n_inputs=kvs['args'].n_inputs,
+                   n_classes=kvs['args'].n_classes,
                    activation='relu'
                    )
         if kvs['gpus'] > 1:
             net = nn.DataParallel(net).to('cuda')
-        else:
-            net = net.to('cuda')
+
+        net = net.to('cuda')
 
 
 
