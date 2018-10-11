@@ -2,7 +2,15 @@
 
 *Aleksei Tiulpin, Tuomas Frondelius, Heikki J. Nieminen, Petri Lehenkari, Simo Saarakkala*
 
+## Installation
+```python
+pip install -e .
+```
+
 ## TODO
+
+### Reproducibility
+- [ ] Conda env and the script for its creation
 
 ### Data pre-processing
 - [ ] Check sample localization algorithm
@@ -11,6 +19,9 @@
 - [ ] Crop width bug fix: some samples can't be cropped. Needs thorough check
 - [ ] Train / test split integration
 
+### Pipeline
+- [ ] LR finder if possible
+
 ### Model evaluation
 - [ ] Test set evaluation metrics (on the assembled back volumes)
 - [ ] VNet experiments
@@ -18,7 +29,13 @@
 - [ ] Fill the tables below
 - [ ] Produce figures
 
-## UNet results
+## UNet experiments
+
+### Hyper-parameters
+
+- [ ] Check Adam
+- [ ] Check SGD
+- [ ] Compare Dice Loss, BCE loss, Dice + BCE, Weighted BCE, Weighted BCE+Dice
 
 |   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
 |:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
@@ -34,7 +51,7 @@
 |    Dice      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
 |    Surf.D.   |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
 
-## UNet+Refinement results
+## UNet + Refinement results
 
 |   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
 |:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
