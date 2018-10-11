@@ -1,12 +1,22 @@
-import argparse
 import numpy as np
 import time
-from mctseg.utils import GlobalKVS, git_info
-from mctseg.unet.loss import loss_dict
-
 import torch
-from termcolor import colored
+from torch import optim
 import os
+
+from torch import nn
+from functools import partial
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from torchvision import transforms
+
+
+from mctseg.utils import GlobalKVS, git_info
+from mctseg.unet.args import parse_args
+from mctseg.unet.loss import BinaryDiceLoss, CombinedLoss, BCEWithLogitsLoss2d
+from mctseg.unet.model import UNet
+from mctseg.unet.datapipelines import build_train_augmentation_pipeline
+from mctseg.unet.dataset import SegmentationDataset, gs2tens, apply_by_index, read_gs_ocv, read_gs_mask_ocv
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if not torch.cuda.is_available():
@@ -50,47 +60,141 @@ def init_session():
     return args, snapshot_name
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='/media/lext/FAST/PTA_segmentation_project/Data/pre_processed')
-    parser.add_argument('--snapshots', default='/media/lext/FAST/PTA_segmentation_project/snapshots/')
-    parser.add_argument('--logs', default='/media/lext/FAST/PTA_segmentation_project/logs/')
-    parser.add_argument('--bs', type=int, default=64)
-    parser.add_argument('--loss', choices=list(loss_dict(None).keys()), default='bce')
-    parser.add_argument('--val_bs', type=int, default=96)
-    parser.add_argument('--n_folds', type=int, default=5)
-    parser.add_argument('--n_classes', type=int, default=2)
-    parser.add_argument('--n_inputs', type=int, default=1)
-    parser.add_argument('--fold', type=int, default=-1)
-    parser.add_argument('--n_epochs', type=int, default=20)
-    parser.add_argument('--n_threads', type=int, default=12)
-    parser.add_argument('--start_val', type=int, default=-1)
-    parser.add_argument('--depth', type=int, default=6)
-    parser.add_argument('--cdepth', type=int, default=1)
-    parser.add_argument('--bw', type=int, default=24)
-    parser.add_argument('--crop_x', type=int, default=256)
-    parser.add_argument('--crop_y', type=int, default=512)
-    parser.add_argument('--lr', type=float, default=1e-2)
-    parser.add_argument('--lr_drop', default=[10, 20, 30])
-    parser.add_argument('--wd', type=float, default=5e-5)
-    parser.add_argument('--seed', type=int, default=42)
-    args = parser.parse_args()
-
-    return args
-
-
-def save_checkpoint(cur_snapshot_name, model, loss_value, prev_model, best_loss):
-    if prev_model is None:
-        print(colored('====> ', 'red') + 'Snapshot was saved to', cur_snapshot_name)
-        torch.save(model.state_dict(), cur_snapshot_name)
-        prev_model = cur_snapshot_name
-        best_loss = loss_value
-        return prev_model, best_loss
+def init_loss():
+    kvs = GlobalKVS()
+    class_weights = kvs['class_weights']
+    if kvs['args'].n_classes == 2:
+        if kvs['args'].loss == 'combined':
+            return CombinedLoss([BCEWithLogitsLoss2d(), BinaryDiceLoss()])
+        elif kvs['args'].loss == 'bce':
+            return BCEWithLogitsLoss2d()
+        elif kvs['args'].loss == 'dice':
+            return BinaryDiceLoss(),
+        elif kvs['args'].loss == 'wbce':
+            return BCEWithLogitsLoss2d(weight=class_weights)
+        else:
+            raise NotImplementedError
     else:
-        if loss_value < best_loss:
-            print(colored('====> ', 'red') + 'Snapshot was saved to', cur_snapshot_name)
-            os.remove(prev_model)
-            best_loss = loss_value
-            torch.save(model.state_dict(), cur_snapshot_name)
-            prev_model = cur_snapshot_name
-    return prev_model, best_loss
+        raise NotImplementedError
+
+
+def init_optimizer(net):
+    kvs = GlobalKVS()
+    if kvs['args'].optimizer == 'adam':
+        return optim.Adam(net.parameters(), lr=kvs['args'].lr, weight_decay=kvs['args'].wd)
+    elif kvs['args'].optimizer == 'sgd':
+        return optim.SGD(net.parameters(), lr=kvs['args'].lr, weight_decay=kvs['args'].wd, momentum=0.9)
+    else:
+        raise NotImplementedError
+
+
+def init_model():
+    kvs = GlobalKVS()
+    if kvs['args'].model == 'unet':
+        net = UNet(bw=kvs['args'].bw, depth=kvs['args'].depth,
+                   center_depth=kvs['args'].cdepth,
+                   n_inputs=kvs['args'].n_inputs,
+                   n_classes=kvs['args'].n_classes - 1,
+                   activation='relu')
+        if kvs['gpus'] > 1:
+            net = nn.DataParallel(net).to('cuda')
+
+        net = net.to('cuda')
+    else:
+        raise NotImplementedError
+
+    return net
+
+
+def init_data_processing():
+    kvs = GlobalKVS()
+    train_augs = build_train_augmentation_pipeline()
+
+    dataset = SegmentationDataset(split=kvs['metadata'],
+                                  trf=train_augs,
+                                  read_img=read_gs_ocv,
+                                  read_mask=read_gs_mask_ocv)
+
+    mean_vector, std_vector, class_weights = init_mean_std(snapshots_dir=kvs['args'].snapshots,
+                                                           dataset=dataset,
+                                                           batch_size=kvs['args'].bs,
+                                                           n_threads=kvs['args'].n_threads,
+                                                           n_classes=kvs['args'].n_classes)
+
+    norm_trf = transforms.Normalize(torch.from_numpy(mean_vector).float(),
+                                    torch.from_numpy(std_vector).float())
+    train_trf = transforms.Compose([
+        train_augs,
+        partial(apply_by_index, transform=norm_trf, idx=0)
+    ])
+
+    val_trf = transforms.Compose([
+        partial(apply_by_index, transform=gs2tens, idx=[0, 1]),
+        partial(apply_by_index, transform=norm_trf, idx=0)
+    ])
+    kvs.update('class_weights', class_weights)
+    kvs.update('train_trf', train_trf)
+    kvs.update('val_trf', val_trf)
+    kvs.save_pkl(os.path.join(kvs['args'].snapshots, kvs['snapshot_name'], 'session.pkl'))
+
+
+def init_loaders(x_train, x_val):
+    kvs = GlobalKVS()
+    train_dataset = SegmentationDataset(split=x_train,
+                                        trf=kvs['train_trf'],
+                                        read_img=read_gs_ocv,
+                                        read_mask=read_gs_mask_ocv)
+
+    val_dataset = SegmentationDataset(split=x_val,
+                                      trf=kvs['val_trf'],
+                                      read_img=read_gs_ocv,
+                                      read_mask=read_gs_mask_ocv)
+
+    train_loader = DataLoader(train_dataset, batch_size=kvs['args'].bs,
+                              num_workers=kvs['args'].n_threads, shuffle=True,
+                              drop_last=True,
+                              worker_init_fn=lambda wid: np.random.seed(np.uint32(torch.initial_seed() + wid)))
+
+    val_loader = DataLoader(val_dataset, batch_size=kvs['args'].val_bs,
+                            num_workers=kvs['args'].n_threads)
+
+    return train_loader, val_loader
+
+
+def init_mean_std(snapshots_dir, dataset, batch_size, n_threads, n_classes):
+    if os.path.isfile(os.path.join(snapshots_dir, 'mean_std_weights.npy')):
+        tmp = np.load(os.path.join(snapshots_dir, 'mean_std_weights.npy'))
+        mean_vector, std_vector, class_weights = tmp
+    else:
+        tmp_loader = DataLoader(dataset, batch_size=batch_size, num_workers=n_threads)
+        mean_vector = None
+        std_vector = None
+        num_pixels = 0
+        class_weights = np.zeros(n_classes)
+        print('==> Calculating mean and std')
+        for batch in tqdm(tmp_loader, total=len(tmp_loader)):
+            imgs = batch['img']
+            masks = batch['mask']
+            if mean_vector is None:
+                mean_vector = np.zeros(imgs.size(1))
+                std_vector = np.zeros(imgs.size(1))
+            for j in range(mean_vector.shape[0]):
+                mean_vector[j] += imgs[:, j, :, :].mean()
+                std_vector[j] += imgs[:, j, :, :].std()
+
+            for j in range(class_weights.shape[0]):
+                class_weights[j] += np.sum(masks.numpy() == j)
+            num_pixels += np.prod(masks.size())
+
+        mean_vector /= len(tmp_loader)
+        std_vector /= len(tmp_loader)
+        class_weights /= num_pixels
+        class_weights = 1 / class_weights
+        class_weights /= class_weights.max()
+        np.save(os.path.join(snapshots_dir, 'mean_std_weights.npy'), [mean_vector.astype(np.float32),
+                                                                      std_vector.astype(np.float32),
+                                                                      class_weights.astype(np.float32)])
+
+    return mean_vector, std_vector, class_weights
+
+

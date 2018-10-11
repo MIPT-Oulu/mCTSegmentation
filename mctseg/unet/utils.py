@@ -2,6 +2,9 @@ import torch
 from tqdm import tqdm
 import gc
 import numpy as np
+from termcolor import colored
+import mctseg.unet.metrics as metrics
+import os
 
 
 def train_epoch(fold, epoch, net, optimizer, train_loader, criterion, max_ep):
@@ -52,44 +55,25 @@ def validate_epoch(epoch, max_epoch, model, val_loader, criterion, n_classes=3):
             else:
                 raise ValueError
 
-            confusion_matrix += calculate_confusion_matrix_from_arrays(preds, mask, n_classes)
+            confusion_matrix += metrics.calculate_confusion_matrix_from_arrays(preds, mask, n_classes)
 
     val_loss /= len(val_loader)
 
     return val_loss, confusion_matrix
 
 
-def calculate_confusion_matrix_from_arrays(prediction, ground_truth, nr_labels):
-    """
-    https://github.com/ternaus/robot-surgery-segmentation/blob/master/validation.py
-    """
-    replace_indices = np.vstack((
-        ground_truth.flatten(),
-        prediction.flatten())
-    ).T
-    confusion_matrix, _ = np.histogramdd(
-        replace_indices,
-        bins=(nr_labels, nr_labels),
-        range=[(0, nr_labels), (0, nr_labels)]
-    )
-    confusion_matrix = confusion_matrix.astype(np.uint32)
-    return confusion_matrix
-
-
-def calculate_dice(confusion_matrix):
-    """
-    https://github.com/ternaus/robot-surgery-segmentation/blob/master/validation.py
-    """
-
-    dices = []
-    for index in range(confusion_matrix.shape[0]):
-        true_positives = confusion_matrix[index, index]
-        false_positives = confusion_matrix[:, index].sum() - true_positives
-        false_negatives = confusion_matrix[index, :].sum() - true_positives
-        denom = 2 * true_positives + false_positives + false_negatives
-        if denom == 0:
-            dice = 0
-        else:
-            dice = 2 * float(true_positives) / denom
-        dices.append(dice)
-    return dices
+def save_checkpoint(cur_snapshot_name, model, loss_value, prev_model, best_loss):
+    if prev_model is None:
+        print(colored('====> ', 'red') + 'Snapshot was saved to', cur_snapshot_name)
+        torch.save(model.state_dict(), cur_snapshot_name)
+        prev_model = cur_snapshot_name
+        best_loss = loss_value
+        return prev_model, best_loss
+    else:
+        if loss_value < best_loss:
+            print(colored('====> ', 'red') + 'Snapshot was saved to', cur_snapshot_name)
+            os.remove(prev_model)
+            best_loss = loss_value
+            torch.save(model.state_dict(), cur_snapshot_name)
+            prev_model = cur_snapshot_name
+    return prev_model, best_loss

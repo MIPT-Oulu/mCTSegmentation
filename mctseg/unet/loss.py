@@ -1,7 +1,8 @@
 from torch import nn
 import torch
 import numpy as np
-
+from torch import optim
+from mctseg.utils import GlobalKVS
 
 class BCEWithLogitsLoss2d(nn.Module):
     """Computationally stable version of 2D BCE loss
@@ -58,12 +59,3 @@ class CombinedLoss(nn.Module):
         for l, w in zip(self.losses, self.weights):
             loss += l(inputs, targets) * w
         return loss
-
-
-def loss_dict(class_weights):
-    return {'combined': CombinedLoss([BCEWithLogitsLoss2d(), BinaryDiceLoss()]),
-            'bce': BCEWithLogitsLoss2d(),
-            'dice': BinaryDiceLoss(),
-            'wbce': BCEWithLogitsLoss2d(weight=class_weights)
-            }
-

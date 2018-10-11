@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from collections import OrderedDict
 import torch.nn.functional as F
+from mctseg.utils import GlobalKVS
 
 
 def ConvBlock3(inp, out, activation):
@@ -36,7 +37,7 @@ class Encoder(nn.Module):
     Aleksei Tiulpin, Unversity of Oulu, 2017 (c).
     """
 
-    def __init__(self, inp_channels, out_channels, depth=2, activation='selu'):
+    def __init__(self, inp_channels, out_channels, depth=2, activation='relu'):
         super().__init__()
         self.layers = nn.Sequential()
 
@@ -60,7 +61,7 @@ class Decoder(nn.Module):
     Aleksei Tiulpin, Unversity of Oulu, 2017 (c).
 
     """
-    def __init__(self, inp_channels, out_channels, depth=2, mode='bilinear', activation='selu'):
+    def __init__(self, inp_channels, out_channels, depth=2, mode='bilinear', activation='relu'):
         super().__init__()
         self.layers = nn.Sequential()
         self.ups_mode = mode
@@ -75,7 +76,7 @@ class Decoder(nn.Module):
             self.layers.add_module('conv_3x3_{}'.format(i), nn.Sequential(*tmp))
 
     def forward(self, x_big, x):
-        x_ups = F.interpolate(x,size=x_big.size()[-2:],mode=self.ups_mode, align_corners=True)
+        x_ups = F.interpolate(x, size=x_big.size()[-2:], mode=self.ups_mode, align_corners=True)
         y = torch.cat([x_ups,x_big], 1)
         y = self.layers(y)
         return y
