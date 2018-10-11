@@ -101,7 +101,8 @@ if __name__ == "__main__":
             cur_snapshot_name = os.path.join(kvs['args'].snapshots, kvs['snapshot_name'],
                                              f'fold_{fold_id}_epoch_{epoch+1}.pth')
 
-            save_checkpoint(cur_snapshot_name, net.module, val_loss, prev_model, best_loss)
+            prev_model, best_loss = save_checkpoint(cur_snapshot_name, net.module,
+                                                    val_loss, prev_model, best_loss)
 
 
 
