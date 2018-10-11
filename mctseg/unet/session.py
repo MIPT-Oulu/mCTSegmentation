@@ -9,7 +9,7 @@ from functools import partial
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torchvision import transforms
-
+from termcolor import colored
 
 from mctseg.utils import GlobalKVS, git_info
 from mctseg.unet.args import parse_args
@@ -171,7 +171,7 @@ def init_mean_std(snapshots_dir, dataset, batch_size, n_threads, n_classes):
         std_vector = None
         num_pixels = 0
         class_weights = np.zeros(n_classes)
-        print('==> Calculating mean and std')
+        print(colored('==> ', 'green') + 'Calculating mean and std')
         for batch in tqdm(tmp_loader, total=len(tmp_loader)):
             imgs = batch['img']
             masks = batch['mask']
