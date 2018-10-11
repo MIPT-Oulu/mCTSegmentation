@@ -13,8 +13,8 @@ if __name__ == "__main__":
     parser.add_argument('--source_ds_path', default='/media/lext/FAST/PTA_segmentation_project/Data/original')
     parser.add_argument('--pre_processed_ds_path',
                         default='/media/lext/FAST/PTA_segmentation_project/Data/pre_processed')
-    parser.add_argument('--crop_size_xy', default=300)
-    parser.add_argument('--crop_size_z', default=572)
+    parser.add_argument('--crop_size_xy', default=448)
+    parser.add_argument('--crop_size_z', default=550)
     args = parser.parse_args()
 
     stacks = glob.glob(os.path.join(args.source_ds_path, '*'))
