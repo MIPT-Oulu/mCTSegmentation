@@ -42,6 +42,8 @@ if __name__ == "__main__":
 
         prev_model = None
         best_loss = 10e10
+        writer = SummaryWriter(os.path.join(kvs['args'].logs, 'mCT_PTA_segmentation',
+                                            'fold_{}'.format(fold_id), kvs['snapshot_name']))
 
         for epoch in range(kvs['args'].n_epochs):
             start = time.time()
@@ -59,15 +61,20 @@ if __name__ == "__main__":
             print(colored('====> ', 'green') + 'Train loss:', train_loss)
             print(colored('====> ', 'green') + 'Val loss:', val_loss)
             print(colored('====> ', 'green') + f'Val Dices: {dices}')
+            writer.add_scalars(f"Losses_{kvs['args'].model}", {'train': train_loss, 'val': val_loss}, epoch)
+            tmp = {}
+            for cls in range(1, len(dices)):
+                tmp[f"Dice [{cls}]"] = dices[f"dice_{cls}"]
 
-            scheduler.step()
+            writer.add_scalars('Metrics', tmp, epoch)
+
             cur_snapshot_name = os.path.join(kvs['args'].snapshots, kvs['snapshot_name'],
                                              f'fold_{fold_id}_epoch_{epoch+1}.pth')
 
             prev_model, best_loss = utils.save_checkpoint(cur_snapshot_name, net.module,
                                                           val_loss, prev_model, best_loss)
 
-
+            scheduler.step()
 
 
 
