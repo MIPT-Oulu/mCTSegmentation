@@ -1,8 +1,7 @@
 from torch import nn
 import torch
 import numpy as np
-from torch import optim
-from mctseg.utils import GlobalKVS
+
 
 class BCEWithLogitsLoss2d(nn.Module):
     """Computationally stable version of 2D BCE loss

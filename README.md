@@ -25,11 +25,12 @@ pip install -e .
 - [ ] Fill the tables below
 - [ ] Produce figures
 
+
+### Loss evaluation
+- [ ] Weighted BCE, Compare Jaccard Loss, BCE loss, BCE - log(Jaccard), Focal Loss, BCE+Lovasz
+
+
 ## UNet experiments
-
-### Hyper-parameters
-
-- [ ] Compare Jaccard Loss, BCE loss, BCE - log(Jaccard), Lovaszh
 
 |   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
 |:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|

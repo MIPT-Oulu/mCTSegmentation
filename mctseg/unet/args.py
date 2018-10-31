@@ -10,7 +10,7 @@ def parse_args():
     parser.add_argument('--optimizer', type=str, choices=['adam', 'sgd'], default='adam')
     parser.add_argument('--bs', type=int, default=64)
     parser.add_argument('--loss', choices=['bce', 'dice', 'wbce', 'combined'], default='bce')
-    parser.add_argument('--val_bs', type=int, default=96)
+    parser.add_argument('--val_bs', type=int, default=64)
     parser.add_argument('--n_folds', type=int, default=5)
     parser.add_argument('--n_classes', type=int, default=2)
     parser.add_argument('--n_inputs', type=int, default=1)
