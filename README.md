@@ -10,22 +10,18 @@ pip install -e .
 ## TODO
 
 ### Reproducibility
-- [ ] Conda env and the script for its creation
+- [ ] Dockerfile
 
 ### Data pre-processing
-- [ ] Check sample localization algorithm
+- [x] Data generation algorithm
 - [ ] Cropped dataset to hdf5
-- [ ] Co-registration artifacts removal (image and mask must be the same size)
-- [ ] Crop width bug fix: some samples can't be cropped. Needs thorough check
+- [x] Co-registration artifacts removal (image and mask must be the same size)
+- [x] Crop width bug fix: some samples can't be cropped. Needs thorough check
 - [ ] Train / test split integration
-
-### Pipeline
-- [ ] LR finder if possible
 
 ### Model evaluation
 - [ ] Test set evaluation metrics (on the assembled back volumes)
 - [ ] VNet experiments
-- [ ] RefinementNet experiments
 - [ ] Fill the tables below
 - [ ] Produce figures
 
@@ -33,9 +29,7 @@ pip install -e .
 
 ### Hyper-parameters
 
-- [ ] Check Adam
-- [ ] Check SGD
-- [ ] Compare Dice Loss, BCE loss, Dice + BCE, Weighted BCE, Weighted BCE+Dice
+- [ ] Compare Jaccard Loss, BCE loss, BCE - log(Jaccard), Lovaszh
 
 |   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
 |:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
@@ -44,14 +38,6 @@ pip install -e .
 |    Surf.D.   |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
 
 ## VNet results
-
-|   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
-|:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
-|      VD      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-|    Dice      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-|    Surf.D.   |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-
-## UNet + Refinement results
 
 |   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
 |:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
