@@ -21,27 +21,16 @@ pip install -e .
 
 ### Model evaluation
 - [ ] Test set evaluation metrics (on the assembled back volumes)
-- [ ] VNet experiments
 - [ ] Fill the tables below
 - [ ] Produce figures
 
 
-### Loss evaluation
-- [ ] Weighted BCE, Compare Jaccard Loss, BCE loss, BCE - log(Jaccard), Focal Loss, BCE+Lovasz
 
+## Experiments
 
-## UNet experiments
+|        Loss        | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
+|:------------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
+|    BCE             |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
+|    -log(Jaccard)   |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
+|    Focal loss      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
 
-|   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
-|:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
-|      VD      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-|    Dice      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-|    Surf.D.   |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-
-## VNet results
-
-|   Metric     | @25 microM [95% CI]| @75 microM [95% CI] |   @105 microM [95% CI]   | @155 microM [95% CI] |
-|:------------:|:------------------:|:-------------------:|:------------------------:|:--------------------:|
-|      VD      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-|    Dice      |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
-|    Surf.D.   |    # [#, #]        |     # [#, #]        | # [#, #]                 | # [#, #]             |
