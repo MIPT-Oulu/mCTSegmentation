@@ -14,13 +14,12 @@ pip install -e .
 
 ### Data pre-processing
 - [x] Data generation algorithm
-- [ ] Cropped dataset to hdf5
 - [x] Co-registration artifacts removal (image and mask must be the same size)
 - [x] Crop width bug fix: some samples can't be cropped. Needs thorough check
 - [ ] Train / test split integration
 
 ### Model evaluation
-- [ ] Test set evaluation metrics (on the assembled back volumes)
+- [ ] Test set evaluation metrics
 - [ ] Fill the tables below
 - [ ] Produce figures
 
