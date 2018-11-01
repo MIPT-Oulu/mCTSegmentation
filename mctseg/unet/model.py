@@ -17,17 +17,19 @@ def ConvBlock3(inp, out, activation):
             nn.ReLU(inplace=True)
         )
 
-    if activation == 'selu':
+    elif activation == 'selu':
         return nn.Sequential(
             nn.Conv2d(inp, out, kernel_size=3, padding=1),
             nn.SELU(inplace=True)
         )
 
-    if activation == 'elu':
+    elif activation == 'elu':
         return nn.Sequential(
             nn.Conv2d(inp, out, kernel_size=3, padding=1),
             nn.ELU(1, inplace=True)
         )
+    else:
+        raise ValueError
 
 
 class Encoder(nn.Module):
@@ -60,6 +62,7 @@ class Decoder(nn.Module):
     Aleksei Tiulpin, Unversity of Oulu, 2017 (c).
 
     """
+
     def __init__(self, inp_channels, out_channels, depth=2, mode='bilinear', activation='relu'):
         super().__init__()
         self.layers = nn.Sequential()
@@ -76,7 +79,7 @@ class Decoder(nn.Module):
 
     def forward(self, x_big, x):
         x_ups = F.interpolate(x, size=x_big.size()[-2:], mode=self.ups_mode, align_corners=True)
-        y = torch.cat([x_ups,x_big], 1)
+        y = torch.cat([x_ups, x_big], 1)
         y = self.layers(y)
         return y
 
@@ -88,7 +91,7 @@ class UNet(nn.Module):
 
     Parameters
     ----------
-    BW : int
+    bw : int
         Basic width of the network, which is doubled at each layer.
     depth : int
         Number of layers
@@ -119,7 +122,7 @@ class UNet(nn.Module):
             # Creating the center
         modules['center'] = nn.Sequential(
             *[ConvBlock3(bw * mul_out, bw * mul_out, activation) for _ in range(center_depth)]
-            )
+        )
         # Automatically creating the decoder
         for level in reversed(range(2, depth + 1)):
             mul_in = 2 ** (level - 1)
