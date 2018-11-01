@@ -12,11 +12,13 @@ from torchvision import transforms
 from termcolor import colored
 
 from mctseg.utils import GlobalKVS, git_info
-from mctseg.unet.args import parse_args
+from mctseg.unet.args import parse_args_train
 from mctseg.unet.loss import BinaryDiceLoss, CombinedLoss, BCEWithLogitsLoss2d
 from mctseg.unet.model import UNet
-from mctseg.unet.datapipelines import build_train_augmentation_pipeline
-from mctseg.unet.dataset import SegmentationDataset, gs2tens, apply_by_index, read_gs_ocv, read_gs_mask_ocv
+from mctseg.unet.dataset import init_train_augmentation_pipeline
+from mctseg.unet.dataset import SegmentationDataset, gs2tens, apply_by_index, \
+    read_gs_ocv, read_gs_mask_ocv
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if not torch.cuda.is_available():
@@ -27,7 +29,7 @@ def init_session():
     kvs = GlobalKVS()
 
     # Getting the arguments
-    args = parse_args()
+    args = parse_args_train()
     # Initializing the seeds
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed(args.seed)
@@ -108,9 +110,9 @@ def init_model():
 
 def init_data_processing():
     kvs = GlobalKVS()
-    train_augs = build_train_augmentation_pipeline()
+    train_augs = init_train_augmentation_pipeline()
 
-    dataset = SegmentationDataset(split=kvs['metadata'],
+    dataset = SegmentationDataset(split=kvs['metadata_train'],
                                   trf=train_augs,
                                   read_img=read_gs_ocv,
                                   read_mask=read_gs_mask_ocv)

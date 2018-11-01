@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from collections import OrderedDict
 import torch.nn.functional as F
-from mctseg.utils import GlobalKVS
 
 
 def ConvBlock3(inp, out, activation):
