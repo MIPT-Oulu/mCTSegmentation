@@ -43,12 +43,13 @@ def train_epoch(net, train_loader, optimizer, criterion):
     return running_loss / n_batches
 
 
-def validate_epoch(net, val_loader, criterion, n_classes=3):
+def validate_epoch(net, val_loader, criterion):
     kvs = GlobalKVS()
     net.train(False)
 
     epoch = kvs['cur_epoch']
     max_epoch = kvs['args'].n_epochs
+    n_classes = kvs['args'].n_classes
 
     device = next(net.parameters()).device
     confusion_matrix = np.zeros((n_classes, n_classes), dtype=np.uint64)
