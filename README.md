@@ -16,7 +16,7 @@ pip install -e .
 - [x] Data generation algorithm
 - [x] Co-registration artifacts removal (image and mask must be the same size)
 - [x] Crop width bug fix: some samples can't be cropped. Needs thorough check
-- [ ] Train / test split integration
+- [x] Train / test split integration
 
 ### Model evaluation
 - [ ] Test set evaluation metrics

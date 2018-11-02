@@ -17,7 +17,7 @@ def parse_args_train():
     parser.add_argument('--n_classes', type=int, default=2)
     parser.add_argument('--n_inputs', type=int, default=1)
     parser.add_argument('--fold', type=int, default=-1)
-    parser.add_argument('--n_epochs', type=int, default=50)
+    parser.add_argument('--n_epochs', type=int, default=15)
     parser.add_argument('--n_threads', type=int, default=20)
     parser.add_argument('--start_val', type=int, default=-1)
     parser.add_argument('--depth', type=int, default=6)
