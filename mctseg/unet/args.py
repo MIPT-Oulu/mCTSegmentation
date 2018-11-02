@@ -26,10 +26,12 @@ def parse_args_train():
     parser.add_argument('--crop_x', type=int, default=384)
     parser.add_argument('--crop_y', type=int, default=640)
     parser.add_argument('--lr', type=float, default=1e-4)
-    parser.add_argument('--lr_drop', default=[20, 25, 28])
+    parser.add_argument('--lr_drop', nargs='+', default=[20, 25, 28])
     parser.add_argument('--wd', type=float, default=1e-4)
     parser.add_argument('--seed', type=int, default=42)
     args = parser.parse_args()
+
+    args.lr_drop = list(map(int, args.lr_drop))
 
     return args
 
