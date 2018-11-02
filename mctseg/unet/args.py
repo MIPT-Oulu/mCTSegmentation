@@ -5,7 +5,7 @@ def parse_args_train():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='/media/lext/FAST/PTA_segmentation_project/Data/pre_processed')
     parser.add_argument('--grades', default='/media/lext/FAST/PTA_segmentation_project/Data/grades.csv')
-    parser.add_argument('--train_size', type=int, default=10)
+    parser.add_argument('--train_size', type=int, default=12)
     parser.add_argument('--snapshots', default='/media/lext/FAST/PTA_segmentation_project/snapshots/')
     parser.add_argument('--logs', default='/media/lext/FAST/PTA_segmentation_project/logs/')
     parser.add_argument('--model', type=str, choices=['unet'], default='unet')
@@ -27,7 +27,7 @@ def parse_args_train():
     parser.add_argument('--crop_y', type=int, default=640)
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--lr_drop', default=[20, 25, 28])
-    parser.add_argument('--wd', type=float, default=1e-5)
+    parser.add_argument('--wd', type=float, default=1e-4)
     parser.add_argument('--seed', type=int, default=42)
     args = parser.parse_args()
 
