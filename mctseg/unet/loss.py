@@ -20,20 +20,20 @@ class BCEWithLogitsLoss2d(nn.Module):
         return self.bce_loss(logits_flat, targets_flat)
 
 
-class BinaryDiceLoss(nn.Module):
-    """SoftDice loss
+class SoftJaccardLoss(nn.Module):
+    """SoftJaccard loss
 
     """
 
     def __init__(self):
-        super(BinaryDiceLoss, self).__init__()
+        super(SoftJaccardLoss, self).__init__()
 
     def forward(self, logits, labels):
         num = labels.size(0)
-        m1 = logits.view(num, -1)
+        m1 = torch.sigmoid(logits.view(num, -1))
         m2 = labels.view(num, -1)
-        intersection = (m1 * m2)
-        score = 2. * (intersection.sum(1) + 1e-15) / (m1.sum(1) + m2.sum(1) + 1e-15)
+        intersection = (m1 * m2).sum(1)
+        score = 2. * (intersection + 1e-15) / (m1.sum(1) + m2.sum(1) + -intersection + 1e-15)
         score = 1 - score.sum() / num
         return score
 

@@ -13,7 +13,7 @@ from termcolor import colored
 
 from mctseg.utils import GlobalKVS, git_info
 from mctseg.unet.args import parse_args_train
-from mctseg.unet.loss import BinaryDiceLoss, CombinedLoss, BCEWithLogitsLoss2d
+from mctseg.unet.loss import SoftJaccardLoss, CombinedLoss, BCEWithLogitsLoss2d
 from mctseg.unet.model import UNet
 from mctseg.unet.dataset import init_train_augmentation_pipeline
 from mctseg.unet.dataset import SegmentationDataset, gs2tens, apply_by_index, \
@@ -67,11 +67,11 @@ def init_loss():
     class_weights = kvs['class_weights']
     if kvs['args'].n_classes == 2:
         if kvs['args'].loss == 'combined':
-            return CombinedLoss([BCEWithLogitsLoss2d(), BinaryDiceLoss()])
+            return CombinedLoss([BCEWithLogitsLoss2d(), SoftJaccardLoss()], weights=kvs['args'].loss_weight)
         elif kvs['args'].loss == 'bce':
             return BCEWithLogitsLoss2d()
-        elif kvs['args'].loss == 'dice':
-            return BinaryDiceLoss(),
+        elif kvs['args'].loss == 'jaccard':
+            return SoftJaccardLoss(),
         elif kvs['args'].loss == 'wbce':
             return BCEWithLogitsLoss2d(weight=class_weights)
         else:
