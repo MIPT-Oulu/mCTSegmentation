@@ -4,16 +4,25 @@ from collections import OrderedDict
 import torch.nn.functional as F
 
 
-def ConvBlock3(inp, out, activation):
-    """3x3 ConvNet building block with different activations support.
+def conv_block3x3(inp, out, activation='relu', normalization='BN'):
+    """3x3 ConvNet building block with different activations and normalizations support.
 
     Aleksei Tiulpin, Unversity of Oulu, 2017 (c).
 
     """
+    if normalization == 'BN':
+        norm_layer = nn.BatchNorm2d(out)
+    elif normalization == 'IN':
+        norm_layer = nn.InstanceNorm2d(out)
+    elif normalization is None:
+        norm_layer = nn.Sequential()
+    else:
+        raise NotImplementedError
+
     if activation == 'relu':
         return nn.Sequential(
             nn.Conv2d(inp, out, kernel_size=3, padding=1),
-            nn.BatchNorm2d(out),
+            norm_layer,
             nn.ReLU(inplace=True)
         )
 
@@ -38,16 +47,16 @@ class Encoder(nn.Module):
     Aleksei Tiulpin, Unversity of Oulu, 2017 (c).
     """
 
-    def __init__(self, inp_channels, out_channels, depth=2, activation='relu'):
+    def __init__(self, inp_channels, out_channels, depth=2, activation='relu', normalization='BN'):
         super().__init__()
         self.layers = nn.Sequential()
 
         for i in range(depth):
             tmp = []
             if i == 0:
-                tmp.append(ConvBlock3(inp_channels, out_channels, activation))
+                tmp.append(conv_block3x3(inp_channels, out_channels, activation, normalization))
             else:
-                tmp.append(ConvBlock3(out_channels, out_channels, activation))
+                tmp.append(conv_block3x3(out_channels, out_channels, activation, normalization))
             self.layers.add_module('conv_3x3_{}'.format(i), nn.Sequential(*tmp))
 
     def forward(self, x):
@@ -63,7 +72,7 @@ class Decoder(nn.Module):
 
     """
 
-    def __init__(self, inp_channels, out_channels, depth=2, mode='bilinear', activation='relu'):
+    def __init__(self, inp_channels, out_channels, depth=2, mode='bilinear', activation='relu', normalization='BN'):
         super().__init__()
         self.layers = nn.Sequential()
         self.ups_mode = mode
@@ -72,9 +81,9 @@ class Decoder(nn.Module):
         for i in range(depth):
             tmp = []
             if i == 0:
-                tmp.append(ConvBlock3(inp_channels, out_channels, activation))
+                tmp.append(conv_block3x3(inp_channels, out_channels, activation, normalization))
             else:
-                tmp.append(ConvBlock3(out_channels, out_channels, activation))
+                tmp.append(conv_block3x3(out_channels, out_channels, activation, normalization))
             self.layers.add_module('conv_3x3_{}'.format(i), nn.Sequential(*tmp))
 
     def forward(self, x_big, x):
@@ -95,41 +104,50 @@ class UNet(nn.Module):
         Basic width of the network, which is doubled at each layer.
     depth : int
         Number of layers
-    center_depth :
+    center_depth : int
         Depth of the central block in UNet.
-    n_inputs :
+    n_inputs : int
         Number of input channels.
-    n_classes :
+    n_classes : int
         Number of input classes
-    activation :
+    activation : str
         Activation function. Can be ReLU, SeLU, or ELU. The latter has parameter 1 by default.
-
+    norm_encoder : str
+        Normalization to be used in the encoder.
+    norm_decoder : str
+        Normalization to be used in the decoder.
+    norm_center : str
+            Normalization to be used in the center of the network.
     """
 
-    def __init__(self, bw=24, depth=6, center_depth=2, n_inputs=1, n_classes=1, activation='relu'):
+    def __init__(self, bw=24, depth=6, center_depth=2, n_inputs=1, n_classes=1,
+                 activation='relu', norm_encoder='BN', norm_decoder='BN', norm_center='BN'):
         super().__init__()
         # Preparing the modules dict
         modules = OrderedDict()
-        modules['down1'] = Encoder(n_inputs, bw, activation=activation)
+        modules['down1'] = Encoder(n_inputs, bw, activation=activation, normalization=norm_encoder)
         # Automatically creating the Encoder based on the depth and width
 
+        mul_out = None
         for level in range(2, depth + 1):
             mul_in = 2 ** (level - 2)
             mul_out = 2 ** (level - 1)
-            layer = Encoder(bw * mul_in, bw * mul_out, activation=activation)
+            layer = Encoder(bw * mul_in, bw * mul_out, activation=activation, normalization=norm_encoder)
             modules['down' + str(level)] = layer
 
+        if mul_out is None:
+            raise ValueError('The depth parameter is wrong. Cannot determine the output size of the encoder')
             # Creating the center
         modules['center'] = nn.Sequential(
-            *[ConvBlock3(bw * mul_out, bw * mul_out, activation) for _ in range(center_depth)]
+            *[conv_block3x3(bw * mul_out, bw * mul_out, activation, norm_center) for _ in range(center_depth)]
         )
         # Automatically creating the decoder
         for level in reversed(range(2, depth + 1)):
             mul_in = 2 ** (level - 1)
-            layer = Decoder(2 * bw * mul_in, bw * mul_in // 2, activation=activation)
+            layer = Decoder(2 * bw * mul_in, bw * mul_in // 2, activation=activation, normalization=norm_decoder)
             modules['up' + str(level)] = layer
 
-        modules['up1'] = Decoder(bw + bw, bw, activation=activation)
+        modules['up1'] = Decoder(bw + bw, bw, activation=activation, normalization=norm_decoder)
 
         modules['mixer'] = nn.Conv2d(bw, n_classes, kernel_size=1, padding=0, stride=1, bias=True)
 

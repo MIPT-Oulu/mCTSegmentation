@@ -1,9 +1,6 @@
 import sys
 import os
-import time
 from termcolor import colored
-
-import numpy as np
 from tensorboardX import SummaryWriter
 
 import cv2

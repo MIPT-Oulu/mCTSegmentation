@@ -1,3 +1,11 @@
+"""
+This script was used to create the pre-processed dataset.
+It localizes the sample and crops out only the region of interest.
+
+(c) Aleksei Tiulpin, University of Oulu, 2018
+
+"""
+
 import cv2
 import argparse
 import os

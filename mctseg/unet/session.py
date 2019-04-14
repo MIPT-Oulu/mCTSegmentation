@@ -71,7 +71,7 @@ def init_loss():
         elif kvs['args'].loss == 'bce':
             return BCEWithLogitsLoss2d()
         elif kvs['args'].loss == 'jaccard':
-            return SoftJaccardLoss(),
+            return SoftJaccardLoss()
         elif kvs['args'].loss == 'wbce':
             return BCEWithLogitsLoss2d(weight=class_weights)
         else:

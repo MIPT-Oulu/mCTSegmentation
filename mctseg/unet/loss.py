@@ -2,17 +2,16 @@ from torch import nn
 import torch
 import numpy as np
 
-
 class BCEWithLogitsLoss2d(nn.Module):
     """Computationally stable version of 2D BCE loss
 
     """
 
-    def __init__(self, weight=None, reduction='elementwise_mean'):
+    def __init__(self, weight=None, reduction='mean'):
         super(BCEWithLogitsLoss2d, self).__init__()
         if isinstance(weight, np.ndarray):
             weight = torch.from_numpy(weight)
-        self.bce_loss = nn.BCEWithLogitsLoss(weight, reduction)
+        self.bce_loss = nn.BCEWithLogitsLoss(weight, reduction=reduction)
 
     def forward(self, logits, targets):
         logits_flat = logits.view(-1)
@@ -33,8 +32,8 @@ class SoftJaccardLoss(nn.Module):
         m1 = torch.sigmoid(logits.view(num, -1))
         m2 = labels.view(num, -1)
         intersection = (m1 * m2).sum(1)
-        score = 2. * (intersection + 1e-15) / (m1.sum(1) + m2.sum(1) + -intersection + 1e-15)
-        score = 1 - score.sum() / num
+        score = (intersection + 1e-15) / (m1.sum(1) + m2.sum(1) - intersection + 1e-15)
+        score = 1 - score.sum(0) / num
         return score
 
 

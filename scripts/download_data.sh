@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-DATA_DIR=../../Data/
+DATA_DIR_LOC=../../
 
 CUR_DIR=$(pwd)
 
-cd $DATA_DIR
+mkdir -p $DATA_DIR_LOC
+cd $DATA_DIR_LOC
 wget http://mipt-ml.oulu.fi/data/mCTSegmentation/PTA_data.tar.gz
 tar -xvf PTA_data.tar.gz
