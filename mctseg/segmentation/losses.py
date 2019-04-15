@@ -2,6 +2,7 @@ from torch import nn
 import torch
 import numpy as np
 
+
 class BCEWithLogitsLoss2d(nn.Module):
     """Computationally stable version of 2D BCE loss
 

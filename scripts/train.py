@@ -6,11 +6,11 @@ from tensorboardX import SummaryWriter
 import cv2
 import torch.optim.lr_scheduler as lr_scheduler
 
-import mctseg.unet.session as session
-import mctseg.unet.metrics as metrics
-import mctseg.unet.dataset as dataset
-import mctseg.unet.utils as utils
-from mctseg.utils import GlobalKVS
+import mctseg.training.session as session
+import mctseg.training.logging as metrics
+import mctseg.training.dataset as dataset
+import mctseg.training.utils as utils
+from mctseg.kvs import GlobalKVS
 
 
 cv2.ocl.setUseOpenCL(False)
@@ -36,12 +36,11 @@ if __name__ == "__main__":
         scheduler = lr_scheduler.MultiStepLR(optimizer, kvs['args'].lr_drop)
         train_loader, val_loader = session.init_loaders(X_train, X_val)
 
-        writer = SummaryWriter(os.path.join(kvs['args'].logs,
-                                            'mCT_PTA_segmentation',
-                                            'fold_{}'.format(fold_id), kvs['snapshot_name']))
+        writer = SummaryWriter(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'],
+                                            'logs', 'fold_{}'.format(fold_id), kvs['snapshot_name']))
 
         for epoch in range(kvs['args'].n_epochs):
-            print(colored('==> ', 'green') + f'Training [{epoch}] with LR {scheduler.get_lr()}')
+            print(colored('==> ', 'green') + f'Training epoch [{epoch}] with LR {scheduler.get_lr()}')
             kvs.update('cur_epoch', epoch)
             train_loss = utils.train_epoch(net, train_loader, optimizer, criterion)
             val_loss, conf_matrix = utils.validate_epoch(net, val_loader, criterion)

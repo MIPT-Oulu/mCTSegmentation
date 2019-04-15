@@ -3,9 +3,9 @@ from tqdm import tqdm
 import gc
 import numpy as np
 from termcolor import colored
-import mctseg.unet.metrics as metrics
+import mctseg.evaluation.metrics as metrics
 import os
-from mctseg.utils import GlobalKVS
+from mctseg.kvs import GlobalKVS
 import operator
 
 
@@ -85,8 +85,8 @@ def save_checkpoint(net, val_metric_name, comparator='lt'):
     epoch = kvs['cur_epoch']
     val_metric = kvs[f'val_metrics_fold_[{fold_id}]'][-1][0][val_metric_name]
     comparator = getattr(operator, comparator)
-    cur_snapshot_name = os.path.join(kvs['args'].snapshots, kvs['snapshot_name'],
-                                     f'fold_{fold_id}_epoch_{epoch}.pth')
+    cur_snapshot_name = os.path.join(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'],
+                                     f'fold_{fold_id}_epoch_{epoch}.pth'))
 
     if kvs['prev_model'] is None:
         print(colored('====> ', 'red') + 'Snapshot was saved to', cur_snapshot_name)
@@ -102,4 +102,4 @@ def save_checkpoint(net, val_metric_name, comparator='lt'):
             kvs.update('prev_model', cur_snapshot_name)
             kvs.update('best_val_metric', val_metric)
 
-    kvs.save_pkl(os.path.join(kvs['args'].snapshots, kvs['snapshot_name'], 'session.pkl'))
+    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))

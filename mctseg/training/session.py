@@ -11,12 +11,13 @@ from tqdm import tqdm
 from torchvision import transforms
 from termcolor import colored
 
-from mctseg.utils import GlobalKVS, git_info
-from mctseg.unet.args import parse_args_train
-from mctseg.unet.loss import SoftJaccardLoss, CombinedLoss, BCEWithLogitsLoss2d
-from mctseg.unet.model import UNet
-from mctseg.unet.dataset import init_train_augmentation_pipeline
-from mctseg.unet.dataset import SegmentationDataset, gs2tens, apply_by_index, \
+from mctseg.segmentation.losses import SoftJaccardLoss, CombinedLoss, BCEWithLogitsLoss2d
+from mctseg.segmentation.unet import UNet
+from mctseg.kvs import GlobalKVS, git_info
+
+from mctseg.training.args import parse_args_train
+from mctseg.training.dataset import init_train_augmentation_pipeline
+from mctseg.training.dataset import SegmentationDataset, gs2tens, apply_by_index, \
     read_gs_ocv, read_gs_mask_ocv
 
 
@@ -36,7 +37,7 @@ def init_session():
     np.random.seed(args.seed)
     # Creating the snapshot
     snapshot_name = time.strftime('%Y_%m_%d_%H_%M')
-    os.makedirs(os.path.join(args.snapshots, snapshot_name), exist_ok=True)
+    os.makedirs(os.path.join(args.workdir, 'snapshots',  snapshot_name), exist_ok=True)
 
     res = git_info()
     if res is not None:
@@ -57,7 +58,7 @@ def init_session():
 
     kvs.update('snapshot_name', snapshot_name)
     kvs.update('args', args)
-    kvs.save_pkl(os.path.join(args.snapshots, snapshot_name, 'session.pkl'))
+    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', snapshot_name, 'session.pkl'))
 
     return args, snapshot_name
 
@@ -92,7 +93,7 @@ def init_optimizer(net):
 
 def init_model():
     kvs = GlobalKVS()
-    if kvs['args'].model == 'unet':
+    if kvs['args'].model == 'training':
         net = UNet(bw=kvs['args'].bw, depth=kvs['args'].depth,
                    center_depth=kvs['args'].cdepth,
                    n_inputs=kvs['args'].n_inputs,
@@ -112,12 +113,12 @@ def init_data_processing():
     kvs = GlobalKVS()
     train_augs = init_train_augmentation_pipeline()
 
-    dataset = SegmentationDataset(split=kvs['metadata_train'],
+    dataset = SegmentationDataset(split=kvs['metadata'],
                                   trf=train_augs,
                                   read_img=read_gs_ocv,
                                   read_mask=read_gs_mask_ocv)
 
-    mean_vector, std_vector, class_weights = init_mean_std(snapshots_dir=kvs['args'].snapshots,
+    mean_vector, std_vector, class_weights = init_mean_std(snapshots_dir=os.path.join(kvs['args'].workdir, 'snapshots'),
                                                            dataset=dataset,
                                                            batch_size=kvs['args'].bs,
                                                            n_threads=kvs['args'].n_threads,
@@ -137,7 +138,7 @@ def init_data_processing():
     kvs.update('class_weights', class_weights)
     kvs.update('train_trf', train_trf)
     kvs.update('val_trf', val_trf)
-    kvs.save_pkl(os.path.join(kvs['args'].snapshots, kvs['snapshot_name'], 'session.pkl'))
+    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))
 
 
 def init_loaders(x_train, x_val):

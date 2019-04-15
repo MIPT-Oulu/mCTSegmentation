@@ -1,10 +1,15 @@
-import os
-import subprocess
 import datetime
+import os
 import pickle
+import subprocess
 
 
 class GlobalKVS(object):
+    """
+    Singleton dictionary with timestamps.
+    Handy tool for data exchange in Machine Learning pipelines.
+
+    """
     _instance = None
     _d = dict()
 
@@ -70,7 +75,7 @@ def git_info():
         env['LANGUAGE'] = 'C'
         env['LANG'] = 'C'
         env['LC_ALL'] = 'C'
-        return subprocess.Popen(cmd, stdout = subprocess.PIPE, env=env).communicate()[0]
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, env=env).communicate()[0]
 
     try:
         out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
@@ -82,4 +87,3 @@ def git_info():
         return None
 
     return git_branch, git_revision
-

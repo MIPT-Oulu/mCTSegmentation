@@ -2,7 +2,7 @@
 
 *Aleksei Tiulpin, Tuomas Frondelius, Heikki J. Nieminen, Petri Lehenkari, Simo Saarakkala*
 
-## Setup the data
+## Data
 
 The data acompanying this paper can be downloaded as follows: `cd scripts && download_data.sh`. 
 By default, it will create a folder in `DATA_DIR` that can be changed.

@@ -4,7 +4,7 @@ import solt.data as sld
 import cv2
 import copy
 
-from mctseg.utils import GlobalKVS
+from mctseg.kvs import GlobalKVS
 import glob
 import pandas as pd
 from sklearn.model_selection import GroupShuffleSplit
@@ -126,19 +126,9 @@ def init_metadata():
         raise ValueError
 
     metadata = pd.merge(metadata, grades, on='sample_id')
-    gss = GroupShuffleSplit(n_splits=1,
-                            train_size=kvs['args'].train_size,
-                            test_size=n_subj-kvs['args'].train_size,
-                            random_state=kvs['args'].seed)
 
-    train_ind, test_ind = next(gss.split(metadata, y=metadata.grade, groups=metadata.subject_id))
-
-    metadata_train = metadata.iloc[train_ind]
-    metadata_test = metadata.iloc[test_ind]
-
-    kvs.update('metadata_train', metadata_train)
-    kvs.update('metadata_test', metadata_test)
-    kvs.save_pkl(os.path.join(kvs['args'].snapshots, kvs['snapshot_name'], 'session.pkl'))
+    kvs.update('metadata', metadata)
+    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))
 
     return metadata
 
@@ -147,21 +137,25 @@ def init_folds():
     kvs = GlobalKVS()
     gkf = GroupKFold(kvs['args'].n_folds)
     cv_split = []
-    for fold_id, (train_ind, val_ind) in enumerate(gkf.split(X=kvs['metadata_train'],
-                                                             y=kvs['metadata_train'].grade,
-                                                             groups=kvs['metadata_train'].subject_id)):
+    for fold_id, (train_ind, val_ind) in enumerate(gkf.split(X=kvs['metadata'],
+                                                             y=kvs['metadata'].grade,
+                                                             groups=kvs['metadata'].subject_id)):
 
         if kvs['args'].fold != -1 and fold_id != kvs['args'].fold:
             continue
 
+        np.random.shuffle(train_ind)
+        train_ind = train_ind[::kvs['args'].skip_train]
+
         cv_split.append((fold_id,
-                         kvs['metadata_train'].iloc[train_ind],
-                         kvs['metadata_train'].iloc[val_ind]))
+                         kvs['metadata'].iloc[train_ind],
+                         kvs['metadata'].iloc[val_ind]))
 
         kvs.update(f'losses_fold_[{fold_id}]', None, list)
         kvs.update(f'val_metrics_fold_[{fold_id}]', None, list)
 
     kvs.update('cv_split', cv_split)
+    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))
 
 
 def init_train_augmentation_pipeline():
