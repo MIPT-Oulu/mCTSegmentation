@@ -7,7 +7,6 @@ import cv2
 import torch.optim.lr_scheduler as lr_scheduler
 
 import mctseg.training.session as session
-import mctseg.training.logging as metrics
 import mctseg.training.dataset as dataset
 import mctseg.training.utils as utils
 from mctseg.kvs import GlobalKVS
@@ -42,10 +41,10 @@ if __name__ == "__main__":
         for epoch in range(kvs['args'].n_epochs):
             print(colored('==> ', 'green') + f'Training epoch [{epoch}] with LR {scheduler.get_lr()}')
             kvs.update('cur_epoch', epoch)
-            train_loss = utils.train_epoch(net, train_loader, optimizer, criterion)
-            val_loss, conf_matrix = utils.validate_epoch(net, val_loader, criterion)
+            train_loss, _ = utils.pass_epoch(net, train_loader, optimizer, criterion)
+            val_loss, conf_matrix = utils.pass_epoch(net, val_loader, None, criterion)
 
-            metrics.log_metrics(writer, train_loss, val_loss, conf_matrix)
+            utils.log_metrics(writer, train_loss, val_loss, conf_matrix)
             utils.save_checkpoint(net, 'val_loss', 'lt')
             scheduler.step()
 
