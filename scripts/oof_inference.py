@@ -88,6 +88,13 @@ if __name__ == "__main__":
             for batch in tqdm(val_loader, total=len(val_loader), desc=f'Predicting fold {fold_id}:'):
                 img = batch['img']
                 sample_ids = batch['sample_id']
+                fnames = batch['fname']
                 predicts = torch.sigmoid(net(img)).mul(255).to('cpu').numpy().astype(np.uint8)
+
+                for idx, fname in enumerate(fnames):
+                    pred_mask = predicts[idx].squeeze()
+                    cv2.imwrite(os.path.join(args.snapshots_root,
+                                             args.snapshot,
+                                             'oof_inference', sample_ids[idx], fname), pred_mask)
 
 

@@ -35,7 +35,7 @@ class SegmentationDataset(data.Dataset):
 
         img, mask = self.transforms((img, mask))
 
-        return {'img': img, 'mask': mask, 'fname': img_fname.split('/')[0],
+        return {'img': img, 'mask': mask, 'fname': img_fname.split('/')[-1],
                 'sample_id': entry.sample_id, 'subject_id': entry.subject_id}
 
     def __len__(self):
