@@ -7,7 +7,6 @@ import copy
 from mctseg.kvs import GlobalKVS
 import glob
 import pandas as pd
-from sklearn.model_selection import GroupShuffleSplit
 import os
 import numpy as np
 from sklearn.model_selection import GroupKFold
@@ -36,7 +35,8 @@ class SegmentationDataset(data.Dataset):
 
         img, mask = self.transforms((img, mask))
 
-        return {'img': img, 'mask': mask}
+        return {'img': img, 'mask': mask, 'fname': img_fname.split('/')[0],
+                'sample_id': entry.sample_id, 'subject_id': entry.subject_id}
 
     def __len__(self):
         return self.split.shape[0]
@@ -120,10 +120,6 @@ def init_metadata():
                                   'sample_id': sample_id, 'subject_id': subject_id})
 
     grades = pd.read_csv(kvs['args'].grades)
-
-    n_subj = np.unique(metadata.subject_id.values).shape[0]
-    if n_subj <= kvs['args'].train_size:
-        raise ValueError
 
     metadata = pd.merge(metadata, grades, on='sample_id')
 
