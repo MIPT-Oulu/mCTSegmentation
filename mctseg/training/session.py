@@ -68,7 +68,8 @@ def init_loss():
     class_weights = kvs['class_weights']
     if kvs['args'].n_classes == 2:
         if kvs['args'].loss == 'combined':
-            return CombinedLoss([BCEWithLogitsLoss2d(), SoftJaccardLoss()], weights=kvs['args'].loss_weight)
+            return CombinedLoss([BCEWithLogitsLoss2d(), SoftJaccardLoss()], weights=[1-kvs['args'].loss_weight,
+                                kvs['args'].loss_weight])
         elif kvs['args'].loss == 'bce':
             return BCEWithLogitsLoss2d()
         elif kvs['args'].loss == 'jaccard':
