@@ -1,10 +1,9 @@
 import torch.utils.data as data
-import torch
-import solt.data as sld
-import cv2
+
 import copy
 
 from mctseg.kvs import GlobalKVS
+from mctseg.imutils import img_mask2solt, solt2img_mask, gs2tens
 import glob
 import pandas as pd
 import os
@@ -40,36 +39,6 @@ class SegmentationDataset(data.Dataset):
 
     def __len__(self):
         return self.split.shape[0]
-
-
-def gs2tens(x, dtype='f'):
-    if dtype == 'f':
-        return torch.from_numpy(x.squeeze()).unsqueeze(0).float()
-    elif dtype == 'l':
-        return torch.from_numpy(x.squeeze()).unsqueeze(0).long()
-    else:
-        raise NotImplementedError
-
-
-def img_mask2solt(imgmask):
-    img, mask = imgmask
-    if len(img.shape) == 2:
-        img = img.reshape(img.shape[0], img.shape[1], 1)
-    return sld.DataContainer((img, mask.squeeze()), 'IM')
-
-
-def solt2img_mask(dc: sld.DataContainer):
-    if dc.data_format != 'IM':
-        raise ValueError
-    return dc.data[0], dc.data[1]
-
-
-def read_gs_ocv(fname):
-    return np.expand_dims(cv2.imread(fname, 0), -1)
-
-
-def read_gs_mask_ocv(fname):
-    return np.expand_dims((cv2.imread(fname, 0) > 0).astype(np.float32), -1)
 
 
 def apply_by_index(items, transform, idx=0):

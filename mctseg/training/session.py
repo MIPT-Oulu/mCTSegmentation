@@ -17,8 +17,8 @@ from mctseg.kvs import GlobalKVS, git_info
 
 from mctseg.training.args import parse_args_train
 from mctseg.training.dataset import init_train_augmentation_pipeline
-from mctseg.training.dataset import SegmentationDataset, gs2tens, apply_by_index, \
-    read_gs_ocv, read_gs_mask_ocv
+from mctseg.training.dataset import SegmentationDataset, apply_by_index
+from mctseg.imutils import read_gs_ocv, read_gs_mask_ocv, gs2tens
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
