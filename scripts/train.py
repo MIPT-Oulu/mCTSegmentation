@@ -9,7 +9,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 import mctseg.training.session as session
 import mctseg.training.dataset as dataset
 import mctseg.training.utils as utils
-from mctseg.kvs import GlobalKVS
+from kvs import GlobalKVS
 
 
 cv2.ocl.setUseOpenCL(False)
@@ -18,12 +18,12 @@ cv2.setNumThreads(0)
 DEBUG = sys.gettrace() is not None
 
 if __name__ == "__main__":
-    kvs = GlobalKVS()
     session.init_session()
     dataset.init_metadata()
     session.init_data_processing()
     dataset.init_folds()
 
+    kvs = GlobalKVS()
     for fold_id, X_train, X_val in kvs['cv_split']:
         kvs.update('cur_fold', fold_id)
         kvs.update('prev_model', None)

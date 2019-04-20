@@ -10,13 +10,12 @@ from termcolor import colored
 import torch
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SequentialSampler
-from torch.nn import functional as F
 from tqdm import tqdm
 
 
-from mctseg.kvs import GlobalKVS
-from mctseg.evaluation import metrics
-from mctseg.training.dataset import SegmentationDataset, read_gs_mask_ocv, read_gs_ocv
+from kvs import GlobalKVS
+from mctseg.training.dataset import SegmentationDataset
+from mctseg.imutils import read_gs_mask_ocv, read_gs_ocv
 from mctseg.training import session
 
 cv2.ocl.setUseOpenCL(False)
@@ -25,7 +24,7 @@ cv2.setNumThreads(0)
 DEBUG = sys.gettrace() is not None
 
 if __name__ == "__main__":
-    kvs = GlobalKVS()
+    kvs = GlobalKVS(None)
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset_root', default='')
     parser.add_argument('--tta', type=bool, default=False)

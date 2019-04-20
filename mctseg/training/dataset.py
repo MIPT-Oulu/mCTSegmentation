@@ -2,7 +2,7 @@ import torch.utils.data as data
 
 import copy
 
-from mctseg.kvs import GlobalKVS
+from kvs import GlobalKVS
 from mctseg.imutils import img_mask2solt, solt2img_mask, gs2tens
 import glob
 import pandas as pd

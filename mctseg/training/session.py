@@ -13,7 +13,8 @@ from termcolor import colored
 
 from mctseg.segmentation.losses import SoftJaccardLoss, CombinedLoss, BCEWithLogitsLoss2d
 from mctseg.segmentation.unet import UNet
-from mctseg.kvs import GlobalKVS, git_info
+from kvs import GlobalKVS
+import subprocess
 
 from mctseg.training.args import parse_args_train
 from mctseg.training.dataset import init_train_augmentation_pipeline
@@ -24,6 +25,33 @@ from mctseg.imutils import read_gs_ocv, read_gs_mask_ocv, gs2tens
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if not torch.cuda.is_available():
     raise EnvironmentError('The code must be run on GPU.')
+
+
+# Return the git revision as a string
+def git_info():
+    def _minimal_ext_cmd(cmd):
+        # construct minimal environment
+        env = {}
+        for k in ['SYSTEMROOT', 'PATH']:
+            v = os.environ.get(k)
+            if v is not None:
+                env[k] = v
+        # LANGUAGE is used on win32
+        env['LANGUAGE'] = 'C'
+        env['LANG'] = 'C'
+        env['LC_ALL'] = 'C'
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, env=env).communicate()[0]
+
+    try:
+        out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
+        git_revision = out.strip().decode('ascii')
+
+        out = _minimal_ext_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+        git_branch = out.strip().decode('ascii')
+    except OSError:
+        return None
+
+    return git_branch, git_revision
 
 
 def init_session():

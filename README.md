@@ -9,7 +9,9 @@ By default, it will create a folder in `DATA_DIR` that can be changed.
 
 ## Installation
 ```
+pip install git+https://github.com/MIPT-Oulu/KVS.git
 pip install -e .
+
 ```
 
 ## TODO

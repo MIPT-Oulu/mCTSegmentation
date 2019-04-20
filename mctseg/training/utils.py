@@ -5,7 +5,7 @@ import numpy as np
 import mctseg.evaluation.metrics as metrics
 import operator
 from termcolor import colored
-from mctseg.kvs import GlobalKVS
+from kvs import GlobalKVS
 import os
 from mctseg.evaluation.metrics import calculate_dice, calculate_iou
 
