@@ -14,13 +14,13 @@ if __name__ == "__main__":
     parser.add_argument('--n_threads', type=int, default=12)
     parser.add_argument('--snapshots_root', default='')
     parser.add_argument('--snapshot', default='')
-    parser.add_argument('--save_dir', default='')
     args = parser.parse_args()
 
     with open(os.path.join(args.snapshots_root, args.snapshot, 'session.pkl'), 'rb') as f:
         session_backup = pickle.load(f)
 
     samples = os.listdir(os.path.join(args.snapshots_root, args.snapshot, 'oof_inference'))
+    samples = list(filter(lambda x: 'hdf' not in x, samples))
     os.makedirs(os.path.join(args.snapshots_root, args.snapshot, 'oof_inference', 'hdf'), exist_ok=True)
     for sample_id in tqdm(samples, total=len(samples)):
         slices_ZX = glob.glob(os.path.join(args.snapshots_root, args.snapshot, 'oof_inference', sample_id, 'ZX_*.png'))

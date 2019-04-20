@@ -93,7 +93,6 @@ def init_metadata():
     metadata = pd.merge(metadata, grades, on='sample_id')
 
     kvs.update('metadata', metadata)
-    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))
 
     return metadata
 
@@ -120,7 +119,6 @@ def init_folds():
         kvs.update(f'val_metrics_fold_[{fold_id}]', None, list)
 
     kvs.update('cv_split', cv_split)
-    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))
 
 
 def init_train_augmentation_pipeline():

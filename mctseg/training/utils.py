@@ -86,8 +86,6 @@ def save_checkpoint(net, val_metric_name, comparator='lt'):
             kvs.update('prev_model', cur_snapshot_name)
             kvs.update('best_val_metric', val_metric)
 
-    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))
-
 
 def log_metrics(writer, train_loss, val_loss, conf_matrix):
     kvs = GlobalKVS()
@@ -121,5 +119,3 @@ def log_metrics(writer, train_loss, val_loss, conf_matrix):
 
     kvs.update(f'losses_fold_[{kvs["cur_fold"]}]', to_log)
     kvs.update(f'val_metrics_fold_[{kvs["cur_fold"]}]', val_metrics)
-
-    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))

@@ -12,13 +12,19 @@ class GlobalKVS(object):
     """
     _instance = None
     _d = dict()
+    _save_dir = None
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, save_dir=None):
         if not cls._instance:
-            cls._instance = super(GlobalKVS, cls).__new__(cls, *args, **kwargs)
+            cls._instance = super(GlobalKVS, cls).__new__(cls)
+        if cls._instance._save_dir is None:
+            cls._instance._save_dir = save_dir
         return cls._instance
 
-    def update(self, tag, value, dtype=None):
+    def set_save_dir(self, save_dir=None):
+        self._save_dir = save_dir
+
+    def update(self, tag, value, dtype=None, save_state=True):
         """
         Updates the internal state of the logger.
 
@@ -30,7 +36,8 @@ class GlobalKVS(object):
             The value to be logged
         dtype :
             Container which is used to store the values under the tag
-
+        save_state : bool
+            Whether to pickle state
         Returns
         -------
 
@@ -47,6 +54,9 @@ class GlobalKVS(object):
                 self._d[tag].update((value, str(datetime.datetime.now())))
             else:
                 self._d[tag] = (value, str(datetime.datetime.now()))
+        if save_state:
+            if self._save_dir is not None:
+                self.save_pkl(self._save_dir)
 
     def __getitem__(self, tag):
         if not isinstance(self._d[tag], (list, dict)):

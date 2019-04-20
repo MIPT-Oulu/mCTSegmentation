@@ -27,8 +27,6 @@ if not torch.cuda.is_available():
 
 
 def init_session():
-    kvs = GlobalKVS()
-
     # Getting the arguments
     args = parse_args_train()
     # Initializing the seeds
@@ -38,6 +36,8 @@ def init_session():
     # Creating the snapshot
     snapshot_name = time.strftime('%Y_%m_%d_%H_%M')
     os.makedirs(os.path.join(args.workdir, 'snapshots',  snapshot_name), exist_ok=True)
+
+    kvs = GlobalKVS(os.path.join(args.workdir, 'snapshots', snapshot_name, 'session.pkl'))
 
     res = git_info()
     if res is not None:
@@ -58,7 +58,6 @@ def init_session():
 
     kvs.update('snapshot_name', snapshot_name)
     kvs.update('args', args)
-    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', snapshot_name, 'session.pkl'))
 
     return args, snapshot_name
 
@@ -141,7 +140,6 @@ def init_data_processing():
     kvs.update('class_weights', class_weights)
     kvs.update('train_trf', train_trf)
     kvs.update('val_trf', val_trf)
-    kvs.save_pkl(os.path.join(kvs['args'].workdir, 'snapshots', kvs['snapshot_name'], 'session.pkl'))
 
 
 def init_loaders(x_train, x_val):
