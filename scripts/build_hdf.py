@@ -21,6 +21,7 @@ if __name__ == "__main__":
 
     samples = os.listdir(os.path.join(args.snapshots_root, args.snapshot, 'oof_inference'))
     samples = list(filter(lambda x: 'hdf' not in x, samples))
+    samples = list(filter(lambda x: 'pkl' not in x, samples))
     os.makedirs(os.path.join(args.snapshots_root, args.snapshot, 'oof_inference', 'hdf'), exist_ok=True)
     for sample_id in tqdm(samples, total=len(samples)):
         slices_ZX = glob.glob(os.path.join(args.snapshots_root, args.snapshot, 'oof_inference', sample_id, 'ZX_*.png'))

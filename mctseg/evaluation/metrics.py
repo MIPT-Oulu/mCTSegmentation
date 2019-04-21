@@ -22,7 +22,7 @@ def calculate_dice(confusion_matrix):
     """
     https://github.com/ternaus/robot-surgery-segmentation/blob/master/validation.py
     """
-
+    confusion_matrix = confusion_matrix.astype(float)
     dices = []
     for index in range(confusion_matrix.shape[0]):
         true_positives = confusion_matrix[index, index]
@@ -41,7 +41,7 @@ def calculate_iou(confusion_matrix):
     """
     https://github.com/ternaus/robot-surgery-segmentation/blob/master/validation.py
     """
-
+    confusion_matrix = confusion_matrix.astype(float)
     ious = []
     for index in range(confusion_matrix.shape[0]):
         true_positives = confusion_matrix[index, index]
@@ -54,3 +54,25 @@ def calculate_iou(confusion_matrix):
             iou = float(true_positives) / denom
         ious.append(iou)
     return ious
+
+
+def calculate_volumetric_similarity(confusion_matrix):
+    """
+    https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4533825/
+
+    """
+    confusion_matrix = confusion_matrix.astype(float)
+    scores = []
+    for index in range(confusion_matrix.shape[0]):
+        true_positives = confusion_matrix[index, index]
+        false_positives = confusion_matrix[:, index].sum() - true_positives
+        false_negatives = confusion_matrix[index, :].sum() - true_positives
+        denom = 2 * true_positives + false_positives + false_negatives
+        if denom == 0:
+            vd = 0
+        else:
+            vd = 1 - abs(false_negatives-false_positives) / denom
+
+        scores.append(vd)
+
+    return scores
