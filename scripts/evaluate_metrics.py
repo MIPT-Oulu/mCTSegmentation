@@ -32,7 +32,6 @@ def make_surf_vol(stack, surf_pad=5):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset_dir', default='')
-    parser.add_argument('--n_threads', type=int, default=12)
     parser.add_argument('--snapshots_root', default='')
     parser.add_argument('--snapshot', default='')
     parser.add_argument('--pred_threshold', type=float, default=0.5)

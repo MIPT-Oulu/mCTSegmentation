@@ -11,7 +11,6 @@ from mctseg.imutils import read_stack
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--n_threads', type=int, default=12)
     parser.add_argument('--snapshots_root', default='')
     parser.add_argument('--snapshot', default='')
     args = parser.parse_args()
