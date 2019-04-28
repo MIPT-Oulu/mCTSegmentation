@@ -4,7 +4,7 @@
 
 ## Data
 
-The data acompanying this paper can be downloaded as follows: `cd scripts && download_data.sh`. 
+The data acompanying this paper can be downloaded as follows: `sh download_data.sh`. 
 By default, it will create a folder in `DATA_DIR` that can be changed.
 
 ## Installation

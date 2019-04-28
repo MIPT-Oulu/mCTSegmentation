@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DATA_DIR_LOC=../../
+DATA_DIR_LOC=../
 
 CUR_DIR=$(pwd)
 
