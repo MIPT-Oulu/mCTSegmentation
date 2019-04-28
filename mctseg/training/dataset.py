@@ -126,9 +126,9 @@ def init_train_augmentation_pipeline():
     ppl = transforms.Compose([
         img_mask2solt,
         slc.Stream([
-            slt.PadTransform(pad_to=(kvs['args'].crop_x+1, kvs['args'].crop_y+1)),
-            slt.CropTransform(crop_size=(kvs['args'].crop_x, kvs['args'].crop_y), crop_mode='r'),
+            slt.PadTransform(pad_to=(kvs['args'].pad_x, kvs['args'].pad_y)),
             slt.RandomFlip(axis=1, p=0.5),
+            slt.CropTransform(crop_size=(kvs['args'].crop_x, kvs['args'].crop_y), crop_mode='r'),
             slt.ImageGammaCorrection(gamma_range=(0.5, 2), p=0.5),
         ]),
         solt2img_mask,
