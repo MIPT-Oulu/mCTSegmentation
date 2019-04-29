@@ -92,7 +92,6 @@ def init_session():
 
 def init_loss():
     kvs = GlobalKVS()
-    class_weights = kvs['class_weights']
     if kvs['args'].n_classes == 2:
         if kvs['args'].loss == 'combined':
             return CombinedLoss([BCEWithLogitsLoss2d(), SoftJaccardLoss()], weights=[1-kvs['args'].loss_weight,
@@ -101,8 +100,6 @@ def init_loss():
             return BCEWithLogitsLoss2d()
         elif kvs['args'].loss == 'jaccard':
             return SoftJaccardLoss()
-        elif kvs['args'].loss == 'wbce':
-            return BCEWithLogitsLoss2d(weight=class_weights)
         else:
             raise NotImplementedError
     else:

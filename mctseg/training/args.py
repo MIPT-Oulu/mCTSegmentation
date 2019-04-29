@@ -10,7 +10,7 @@ def parse_args_train():
     parser.add_argument('--model', type=str, choices=['unet'], default='unet')
     parser.add_argument('--optimizer', type=str, choices=['adam', 'sgd'], default='adam')
     parser.add_argument('--bs', type=int, default=32)
-    parser.add_argument('--loss', choices=['bce', 'jaccard', 'wbce', 'combined'], default='bce')
+    parser.add_argument('--loss', choices=['bce', 'jaccard', 'combined'], default='bce')
     parser.add_argument('--loss_weight', type=float, default=0.5)
     parser.add_argument('--val_bs', type=int, default=32)
     parser.add_argument('--n_folds', type=int, default=5)

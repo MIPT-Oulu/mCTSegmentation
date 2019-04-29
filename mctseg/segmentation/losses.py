@@ -8,11 +8,10 @@ class BCEWithLogitsLoss2d(nn.Module):
 
     """
 
-    def __init__(self, weight=None, reduction='mean'):
+    def __init__(self):
         super(BCEWithLogitsLoss2d, self).__init__()
-        if isinstance(weight, np.ndarray):
-            weight = torch.from_numpy(weight)
-        self.bce_loss = nn.BCEWithLogitsLoss(weight, reduction=reduction)
+
+        self.bce_loss = nn.BCEWithLogitsLoss(None, reduction='mean')
 
     def forward(self, logits, targets):
         logits_flat = logits.view(-1)
