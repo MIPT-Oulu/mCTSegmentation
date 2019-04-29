@@ -45,7 +45,7 @@ def pass_epoch(net, loader, optimizer, criterion):
                 pbar.set_description(desc=f"Fold [{fold_id}] [{epoch} | {max_ep}] | Validation progress")
                 mask = mask.to('cpu').numpy()
                 if n_classes == 2:
-                    preds = (outputs.to('cpu').numpy() > 0.5).astype(float)
+                    preds = (outputs.to('cpu').numpy() > kvs['args'].binary_threshold).astype(float)
                 elif n_classes > 2:
                     preds = outputs.to('cpu').numpy().argmax(axis=1)
                 else:

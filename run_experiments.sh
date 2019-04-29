@@ -12,7 +12,15 @@
 #python scripts/train.py --loss jaccard
 
 ## Experiment 3
+python scripts/train.py --loss focal
+
+## Experiment 4
+python scripts/train.py --loss jaccard --log_jaccard True
+
+## Experiment 5
 python scripts/train.py --loss combined
 
+## Experiment 6
+python scripts/train.py --loss combined --log_jaccard True
 
 sh evaluate_snapshots.sh
