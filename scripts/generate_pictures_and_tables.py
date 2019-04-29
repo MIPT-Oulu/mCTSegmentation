@@ -6,7 +6,6 @@ import glob
 import os
 import pickle
 import pandas as pd
-import numpy as np
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -33,8 +32,7 @@ if __name__ == "__main__":
         axs.set_ylabel(metric)
 
         for setting_key, setting, color in [('Jaccard', ('jaccard', 0.5), 'r'),
-                                            ('BCE', ('bce', 0.5), 'b'),
-                                            ('Jaccard+BCE', ('combined', 0.5), 'g')]:
+                                            ('BCE', ('bce', 0.5), 'b')]:
             exp = experiments[setting]
             exp = exp[exp.metric == metric]
             val_columns = list(filter(lambda x: 'val@' in x, exp.columns.tolist()))
@@ -44,7 +42,10 @@ if __name__ == "__main__":
                 std = exp[val_columns].std(0).values
                 plt.errorbar(pads, mean, yerr=std, fmt='o-', color='blue', capsize=3)
 
-        axs.set_ylim(0.35, 1.15)
+        if metric == 'IoU':
+            axs.set_ylim(0.3, 1)
+        else:
+            axs.set_ylim(0.6, 1)
         plt.show()
 
 
