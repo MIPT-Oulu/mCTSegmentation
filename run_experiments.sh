@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
+# Getting the data
 sh download_data.sh
 
-cd scripts/
+# Running the experiments
 
-# Experiment 1
-python train.py --loss bce
+## Experiment 1
+python scripts/train.py --loss bce
 
-# Experiment 2
-python train.py --loss jaccard
+## Experiment 2
+python scripts/train.py --loss jaccard
 
-sh ../evaluate_snapshots.sh
+
+sh evaluate_snapshots.sh
