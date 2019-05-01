@@ -9,6 +9,7 @@ do
     echo "===> Working on the snapshot ${SNAPSHOT}"
     python scripts/oof_inference.py --dataset ${DATA} --snapshots_root ${SNAPSHOTS_ROOT} --snapshot ${SNAPSHOT}
     python scripts/build_hdf.py --snapshots_root ${SNAPSHOTS_ROOT} --snapshot ${SNAPSHOT}
-    python scripts/evaluate_metrics.py --snapshots_root ${SNAPSHOTS_ROOT} --snapshot ${SNAPSHOT} --dataset_dir ${DATA}
+    python scripts/evaluate_metrics.py --snapshots_root ${SNAPSHOTS_ROOT} \
+                                       --snapshot ${SNAPSHOT} --dataset_dir ${DATA}
 done
 

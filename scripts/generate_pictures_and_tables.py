@@ -22,7 +22,9 @@ if __name__ == "__main__":
 
         loss_type = session_backup['args'][0].loss
         loss_weight = session_backup['args'][0].loss_weight
-        experiments[(loss_type, loss_weight)] = pd.read_pickle(os.path.join(snp, 'oof_inference', 'results.pkl'))
+        log_jaccard = getattr(session_backup['args'][0], "log_jaccard", False)
+        experiments[(loss_type, loss_weight, log_jaccard)] = pd.read_pickle(os.path.join(snp, 'oof_inference',
+                                                                                         'results.pkl'))
 
     for metric in ['IoU', 'Dice', 'VS']:
         matplotlib.rcParams.update({'font.size': 14})
@@ -31,16 +33,17 @@ if __name__ == "__main__":
         axs.set_xlabel('Pad [$\mu$M]')
         axs.set_ylabel(metric)
 
-        for setting_key, setting, color in [('Jaccard', ('jaccard', 0.5), 'r'),
-                                            ('BCE', ('bce', 0.5), 'b')]:
+        for setting_key, setting, color in [('Jaccard', ('jaccard', 0.5, True), 'r'),
+                                            ('BCE', ('bce', 0.5, False), 'b'),
+                                            ('Jaccard', ('jaccard', 0.5, False), 'g')]:
             exp = experiments[setting]
             exp = exp[exp.metric == metric]
             val_columns = list(filter(lambda x: 'val@' in x, exp.columns.tolist()))
             pads = list(map(lambda x: int(x.split('@')[1]) * args.spacing, val_columns))
-            if setting_key == 'BCE':
-                mean = exp[val_columns].mean(0).values
-                std = exp[val_columns].std(0).values
-                plt.errorbar(pads, mean, yerr=std, fmt='o-', color='blue', capsize=3)
+
+            mean = exp[val_columns].mean(0).values
+            std = exp[val_columns].std(0).values
+            plt.errorbar(pads, mean, yerr=std, fmt='o-', color=color, capsize=3)
 
         if metric == 'IoU':
             axs.set_ylim(0.3, 1)
