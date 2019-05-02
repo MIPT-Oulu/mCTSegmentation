@@ -15,6 +15,15 @@ pip install -e .
 
 ## Results
 
-<center>
-<img src="pics/IoU.png" width="300"/> <img src="pics/Dice.png" width="300"/><img src="pics/VS.png" width="300"/>  
-</center>
+<table style="width:100%">
+  <tr>
+    <td><img src="pics/IoU.png" width="300" /> </td>
+    <td><img src="pics/Dice.png" width="300"/></td>
+    <td><img src="pics/VS.png" width="300"/></td>  
+  </tr>
+  <tr>
+    <td align="center">IoU</td>
+    <td align="center">Dice</td>
+    <td align="center">Volumetric Similarity</td>
+  </tr>
+</table>
