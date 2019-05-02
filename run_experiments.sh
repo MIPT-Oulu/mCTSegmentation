@@ -24,3 +24,5 @@ python scripts/train.py --loss combined
 python scripts/train.py --loss combined --log_jaccard True
 
 sh evaluate_snapshots.sh
+
+python scripts/generate_pictures_and_tables.py

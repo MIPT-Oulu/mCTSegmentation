@@ -2,16 +2,20 @@
 
 *Aleksei Tiulpin, Tuomas Frondelius, Heikki J. Nieminen, Petri Lehenkari, Simo Saarakkala*
 
-## Data
-
-The data acompanying this paper can be downloaded as follows: `sh download_data.sh`. 
-By default, it will create a folder in `DATA_DIR` that can be changed.
-
 ## Installation
 ```
 pip install git+https://github.com/MIPT-Oulu/KVS.git
 pip install -e .
 ```
+
+## Training
+The script below will download the data, execute the experiments (it will take several days on 3xGTX1080Ti) 
+and eventually generate the result pictures presented below. 
+
+```
+sh run_experiments.sh
+```
+
 
 ## Results
 

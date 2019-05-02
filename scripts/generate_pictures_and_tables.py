@@ -9,11 +9,11 @@ import pandas as pd
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--snapshots_root', default='')
+    parser.add_argument('--snapshots_root', default='../workdir/snapshots')
     parser.add_argument('--snapshot_prefix', default='2019_0')
     parser.add_argument('--spacing', type=float, default=3.)
-    parser.add_argument('--save_dir', default='')
-    parser.add_argument('--extension', default='')
+    parser.add_argument('--save_dir', default='../')
+    parser.add_argument('--extension', choices=['pdf', 'png'], default='png')
     args = parser.parse_args()
 
     snapshots = glob.glob(os.path.join(args.snapshots_root, f'{args.snapshot_prefix}*'))
@@ -53,6 +53,6 @@ if __name__ == "__main__":
         plt.legend()
         plt.savefig(os.path.join(args.save_dir,
                                  'pics', f'{metric}.{args.extension}'), bbox_inches='tight')
-        plt.show()
+        plt.close()
 
 
