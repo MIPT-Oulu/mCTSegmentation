@@ -11,24 +11,10 @@ By default, it will create a folder in `DATA_DIR` that can be changed.
 ```
 pip install git+https://github.com/MIPT-Oulu/KVS.git
 pip install -e .
-
 ```
 
-## TODO
+## Results
 
-### Reproducibility
-- [ ] Dockerfile
-
-### Model evaluation
-- [ ] Test set evaluation metrics
-- [ ] Fill the tables below
-- [ ] Produce figures
-
-## Experiments
-
-| Model     | IoU@25 microM [95% CI]     | IoU@75 microM [95% CI]      | IoU@105 microM [95% CI]  | IoU@155 microM [95% CI] |
-|:---------|:--------------------------:|:---------------------------:|:------------------------:|:-----------------------:|
-|  UNet (baseline)     |    # [#, #]                |     # [#, #]                | # [#, #]                 | # [#, #]                |
-|  UNet-IN  |    # [#, #]                |     # [#, #]                | # [#, #]                 | # [#, #]                |
-|  VGG11-UNet  |    # [#, #]                |     # [#, #]                | # [#, #]                 | # [#, #]                |
-|  VGG11-UNet-IN  |    # [#, #]                |     # [#, #]                | # [#, #]                 | # [#, #]                |
+<center>
+<img src="pics/IoU.png" width="300"/> <img src="pics/Dice.png" width="300"/><img src="pics/VS.png" width="300"/>  
+</center>
