@@ -4,8 +4,7 @@
 
 ## Installation
 ```
-pip install git+https://github.com/MIPT-Oulu/KVS.git
-pip install -e .
+pip install deeppipeline=0.1.2
 ```
 
 ## Training

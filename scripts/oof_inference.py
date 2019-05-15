@@ -13,10 +13,7 @@ from torch.utils.data.sampler import SequentialSampler
 from tqdm import tqdm
 
 
-from kvs import GlobalKVS
-from mctseg.training.dataset import SegmentationDataset
-from mctseg.imutils import read_gs_mask_ocv, read_gs_ocv
-from mctseg.training import session
+from mctseg.dataset import SegmentationDataset
 
 cv2.ocl.setUseOpenCL(False)
 cv2.setNumThreads(0)
