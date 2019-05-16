@@ -40,9 +40,9 @@ def init_scheduler(optimizer):
 
 def parse_train_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='/media/lext/FAST/PTA_segmentation_project/Data/pre_processed')
-    parser.add_argument('--grades', default='/media/lext/FAST/PTA_segmentation_project/Data/grades.csv')
-    parser.add_argument('--workdir', default='/media/lext/FAST/PTA_segmentation_project/workdir')
+    parser.add_argument('--dataset', default='../Data/pre_processed')
+    parser.add_argument('--grades', default='../Data/grades.csv')
+    parser.add_argument('--workdir', default='../workdir')
     parser.add_argument('--model', type=str, choices=['unet'], default='unet')
     parser.add_argument('--optimizer', type=str, choices=['adam', 'sgd'], default='adam')
     parser.add_argument('--bs', type=int, default=32)
