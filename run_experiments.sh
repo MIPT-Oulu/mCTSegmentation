@@ -9,16 +9,16 @@ sh download_data.sh
 python scripts/train.py --loss bce
 
 ## Experiment 2
-python scripts/train.py --loss jaccard
+#python scripts/train.py --loss jaccard
 
 ## Experiment 3
 python scripts/train.py --loss focal
 
 ## Experiment 4
-python scripts/train.py --loss jaccard --log_jaccard True
+#python scripts/train.py --loss jaccard --log_jaccard True
 
 ## Experiment 5
-python scripts/train.py --loss combined
+#python scripts/train.py --loss combined
 
 ## Experiment 6
 python scripts/train.py --loss combined --log_jaccard True

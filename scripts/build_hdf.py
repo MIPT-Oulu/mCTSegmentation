@@ -6,7 +6,7 @@ import pickle
 import numpy as np
 import h5py
 import gc
-from mctseg.imutils import read_stack
+from deeppipeline.io import read_3d_stack
 
 
 if __name__ == "__main__":
@@ -29,8 +29,8 @@ if __name__ == "__main__":
         slices_ZX.sort(key=lambda x: int(x.split('/')[-1].split('.')[0].split('_')[-1]))
         slices_ZY.sort(key=lambda x: int(x.split('/')[-1].split('.')[0].split('_')[-1]))
 
-        stack_ZX: np.ndarray = read_stack(slices_ZX)
-        stack_ZY: np.ndarray = read_stack(slices_ZY)
+        stack_ZX: np.ndarray = read_3d_stack(slices_ZX)
+        stack_ZY: np.ndarray = read_3d_stack(slices_ZY)
 
         stack_combined = (stack_ZY.swapaxes(1, 2) + stack_ZX) / 2.
 

@@ -6,10 +6,11 @@ import pickle
 import numpy as np
 import h5py
 import gc
+import pandas as pd
+
 from deeppipeline.io import read_3d_stack
 from deeppipeline.segmentation.evaluation.metrics import calculate_confusion_matrix_from_arrays
 from deeppipeline.segmentation.evaluation.metrics import calculate_iou, calculate_dice, calculate_volumetric_similarity
-import pandas as pd
 
 
 def make_surf_vol(stack, surf_pad=5):
