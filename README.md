@@ -4,7 +4,7 @@
 
 ## Installation
 ```
-pip install deeppipeline=0.2
+conda create -f pta_segmentation.yml
 ```
 
 ## Training
