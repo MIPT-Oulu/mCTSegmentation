@@ -6,10 +6,11 @@ import pickle
 import numpy as np
 import h5py
 import gc
-from mctseg.imutils import read_stack
-from mctseg.evaluation.metrics import calculate_confusion_matrix_from_arrays, calculate_iou, calculate_dice
-from mctseg.evaluation.metrics import calculate_volumetric_similarity
 import pandas as pd
+
+from deeppipeline.io import read_3d_stack
+from deeppipeline.segmentation.evaluation.metrics import calculate_confusion_matrix_from_arrays
+from deeppipeline.segmentation.evaluation.metrics import calculate_iou, calculate_dice, calculate_volumetric_similarity
 
 
 def make_surf_vol(stack, surf_pad=5):
@@ -58,7 +59,7 @@ if __name__ == "__main__":
 
         masks = glob.glob(os.path.join(args.dataset_dir, sample_id, 'masks', 'ZX*.png'))
         masks.sort(key=lambda x: int(x.split('/')[-1].split('_')[-1].split('.')[0]))
-        gt_stack = read_stack(masks) > 0.9
+        gt_stack = read_3d_stack(masks) > 0.9
 
         iou_scores = {t: list() for t in thresholds}
         dice_scores = {t: list() for t in thresholds}
@@ -90,7 +91,8 @@ if __name__ == "__main__":
         pbar.update()
     pbar.close()
     for t in thresholds:
-        results_df = pd.DataFrame(data=results[t], columns=['sample', 'metric', ]+[f'val@{pad_val}' for pad_val in paddings])
+        results_df = pd.DataFrame(data=results[t], columns=['sample', 'metric', ] +
+                                                           [f'val@{pad_val}' for pad_val in paddings])
         results_df.to_pickle(os.path.join(args.snapshots_root, args.snapshot, 'oof_inference', f'results_{t}.pkl'))
 
 

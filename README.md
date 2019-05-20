@@ -4,8 +4,7 @@
 
 ## Installation
 ```
-pip install git+https://github.com/MIPT-Oulu/KVS.git
-pip install -e .
+conda create -f pta_segmentation.yml
 ```
 
 ## Training

@@ -1,4 +1,6 @@
 import matplotlib
+matplotlib.use('agg')
+
 import matplotlib.pyplot as plt
 
 import argparse
@@ -12,11 +14,11 @@ if __name__ == "__main__":
     parser.add_argument('--snapshots_root', default='../workdir/snapshots')
     parser.add_argument('--snapshot_prefix', default='2019_0')
     parser.add_argument('--spacing', type=float, default=3.)
-    parser.add_argument('--save_dir', default='../')
+    parser.add_argument('--save_dir', default='.')
     parser.add_argument('--extension', choices=['pdf', 'png'], default='png')
     args = parser.parse_args()
 
-    snapshots = glob.glob(os.path.join(args.snapshots_root, f'{args.snapshot_prefix}*'))
+    snapshots = glob.glob(os.path.join(args.snapshots_root, f'*{args.snapshot_prefix}*'))
     experiments = {}
     for snp in snapshots:
         with open(os.path.join(snp, 'session.pkl'), 'rb') as f:
