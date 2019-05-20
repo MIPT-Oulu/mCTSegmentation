@@ -35,5 +35,5 @@ if __name__ == "__main__":
         args.seed = session_backup['args'][0].seed
 
     kvs.update('args', args)
-    run_oof_binary(session_backup=session_backup, read_img=read_gs_ocv,
+    run_oof_binary(args=args, session_backup=session_backup, read_img=read_gs_ocv,
                    read_mask=read_gs_binary_mask_ocv, img_group_id_colname='sample_id')
