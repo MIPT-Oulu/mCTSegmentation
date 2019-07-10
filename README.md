@@ -22,7 +22,7 @@ focal loss, soft-Jaccard loss and also the soft-Jaccard loss combined with cross
 You need to install my mono-repository that enables binary segmentation possible.
 
 ```
-pip install deeppipeline=0.1.2
+conda create -f pta_segmentation.yml
 ```
 
 ### Dataset

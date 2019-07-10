@@ -3,7 +3,7 @@ import cv2
 from deeppipeline.segmentation.training.core import train_n_folds
 from deeppipeline.io import read_gs_ocv, read_gs_binary_mask_ocv
 
-from .mctseg.utils import parse_train_args, init_metadata, init_scheduler
+from utils import parse_train_args, init_metadata, init_scheduler
 
 cv2.ocl.setUseOpenCL(False)
 cv2.setNumThreads(0)
