@@ -1,13 +1,35 @@
-# Deep Learning-based 3D Segmentation of Calcified Cartilage Interface in Human Osteochondral Samples Imaged with Micro-Computed Tomography
+# Deep-Learning for Tidemark Segmentation in Human Osteochondral Tissues Imaged with Micro-computed Tomography
 
-*Aleksei Tiulpin, Tuomas Frondelius, Heikki J. Nieminen, Petri Lehenkari, Simo Saarakkala*
+The codes and the dataset.
 
-## Installation
+(c) Aleksei Tiulpin, University of Oulu, 2019.
+
+## TL;DR;
+In this paper we introduced a new dataset for biomedical image segmentation. We tackled the problem of 
+segmenting tidemark in human ostechondral samples stained with PTA contrast agent. We imaged the samples
+with two different contrast agents (PTA and CA4+) and eventually co-registered the imaging results. 
+
+The method described above allowed us to obtain the calcified tissue masks as it is well visible in CA4+ in contrast to PTA.
+We used U-Net with minor modifications and benchmarked several loss functions: cross entropy, 
+focal loss, soft-Jaccard loss and also the soft-Jaccard loss combined with cross-entropy.
+
+<center>
+<img src="pics/pipeline.png" width="900"/>
+</center>
+
+## Codes
+### Installation
+You need to install my mono-repository that enables binary segmentation possible.
+
 ```
 pip install deeppipeline=0.1.2
 ```
 
-## Training
+### Dataset
+You can use the script `download_data.sh` to get the dataset. It will also be downloaded automatically by the training 
+script.
+
+### Training
 The script below will download the data, execute the experiments (it will take several days on 3xGTX1080Ti) 
 and eventually generate the result pictures presented below. 
 
@@ -16,7 +38,9 @@ sh run_experiments.sh
 ```
 
 
-## Results
+### Results
+At the end of the script's execution, somewhat similar pictures (as in the paper) will be stored
+in the folder `pics`.
 
 <table style="width:100%">
   <tr>
@@ -30,3 +54,6 @@ sh run_experiments.sh
     <td align="center">Volumetric Similarity</td>
   </tr>
 </table>
+
+## Citing this work
+To use this dataset in your work, please, refer to our paper.
