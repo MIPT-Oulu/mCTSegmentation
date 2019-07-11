@@ -22,6 +22,8 @@ focal loss, soft-Jaccard loss and also the soft-Jaccard loss combined with cross
 ## Codes
 ### Installation
 You need to install my mono-repository that enables binary segmentation possible.
+Use the line below that creates a conda environment and fetches all the necessary dependencies
+from `pip` and `conda`:
 
 ```
 conda env create -f pta_segmentation.yml
