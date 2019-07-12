@@ -8,7 +8,7 @@ ArXiv pre-print: https://arxiv.org/abs/1907.05089
 
 (c) Aleksei Tiulpin, University of Oulu, 2019.
 
-## TL;DR;
+## About
 In this paper we introduced a new dataset for biomedical image segmentation. We tackled the problem of 
 segmenting tidemark in human ostechondral samples stained with PTA contrast agent. We imaged the samples
 with two different contrast agents (PTA and CA4+) and eventually co-registered the imaging results. 
