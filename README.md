@@ -60,4 +60,12 @@ in the folder `pics`.
 </table>
 
 ## Citing this work
-To use this dataset in your work, please, refer to our paper.
+To use this dataset in your work, please, refer to our pre-print (for now):
+```
+@misc{1907.05089,
+  Author = {Aleksei Tiulpin and Mikko Finnilä and Petri Lehenkari and Heikki J. Nieminen and Simo Saarakkala},
+  Title = {Deep-Learning for Tidemark Segmentation in Human Osteochondral Tissues Imaged with Micro-computed Tomography},
+  Year = {2019},
+  Eprint = {arXiv:1907.05089},
+}
+```
