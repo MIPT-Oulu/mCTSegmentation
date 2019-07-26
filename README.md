@@ -62,7 +62,7 @@ in the folder `pics`.
 </table>
 
 ## Citing this work
-To use this dataset in your work, please, refer to our pre-print (for now):
+To use our dataset in your work, please, refer to our pre-print (for now):
 ```
 @misc{1907.05089,
   Author = {Aleksei Tiulpin and Mikko Finnilä and Petri Lehenkari and Heikki J. Nieminen and Simo Saarakkala},
