@@ -2,8 +2,6 @@
 
 The codes and the dataset.
 
-OpenReview submission to MICCAI 2019 COMPAY workshop: https://openreview.net/forum?id=SJxFegjX-r.
-
 ArXiv pre-print: https://arxiv.org/abs/1907.05089
 
 (c) Aleksei Tiulpin, University of Oulu, 2019.
